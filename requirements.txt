@@ -20,7 +20,8 @@ django-filter==25.1
 # Campos y formularios
 django-crispy-forms==2.4
 crispy-bootstrap5==2024.10
-django-colorfield==0.14.0  # ✅ Versión corregida
+django-colorfield==0.14.0
+django-nested-admin==4.1.1  # ✅ Versión corregida
 
 # Imágenes
 Pillow==11.3.0
