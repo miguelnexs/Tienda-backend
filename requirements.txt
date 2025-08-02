@@ -22,7 +22,7 @@ django-crispy-forms==2.4
 crispy-bootstrap5==2024.10
 
 # Imágenes
-Pillow==10.0.0
+pip install Pillow==11.3.0
 
 # Validaciones y utilidades
 python-decouple==3.9
@@ -50,4 +50,5 @@ gunicorn==23.0.0
 whitenoise==6.8.2
 dj-database-url==3.0.1
 python-dotenv==1.0.1
+
 
