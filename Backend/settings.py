@@ -45,7 +45,8 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # CSRF deshabilitado para APIs - se maneja por authentication
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -119,18 +120,24 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuración CORS para desarrollo local
+# Configuración CORS para desarrollo y producción
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_CREDENTIALS = True
+
+# Orígenes permitidos para CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React por defecto
+    "http://localhost:3000",    # React por defecto
     "http://127.0.0.1:3000",
-    "http://localhost:8080",  # Vue por defecto
+    "http://localhost:8080",    # Vue por defecto
     "http://127.0.0.1:8080",
-    "http://localhost:5173",  # Vite por defecto
+    "http://localhost:5173",    # Vite por defecto
     "http://127.0.0.1:5173",
+    "file://",                  # Aplicaciones Electron
+    "app://",                   # Aplicaciones Electron alternativo
 ]
+
+# Métodos HTTP permitidos por CORS
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -138,6 +145,20 @@ CORS_ALLOW_METHODS = [
     'PATCH',
     'POST',
     'PUT',
+]
+
+# Headers permitidos por CORS
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cache-control',
 ]
 
 # Si usas WhiteNoise para servir archivos estáticos/media en producción:
