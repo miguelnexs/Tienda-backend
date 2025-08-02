@@ -34,5 +34,6 @@ python-dateutil==2.9.0.post0
 drf-spectacular==0.28.0
 
 # Producción
+django-debug-toolbar==5.2.0
 gunicorn==23.0.0
 whitenoise==6.8.2
