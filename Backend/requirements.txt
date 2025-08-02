@@ -7,6 +7,7 @@ pip install python-dotenv==1.0.0
 pip install django-filter==23.2
 pip install drf-nested-routers==0.93.4
 pip install django-colorfield==0.11.0
-pip install Pillow==10.0.0
+pip install Pillow==11.3.0
 pip install dj-database-url==3.0.1
 pip install whitenoise==6.5.0
+pip install gunicorn==23.0.0
