@@ -20,22 +20,18 @@ django-filter==25.1
 # Campos y formularios
 django-crispy-forms==2.4
 crispy-bootstrap5==2024.10
+django-colorfield==1.0.0  # <-- ¡Paquete faltante añadido!
 
 # Imágenes
 Pillow==11.3.0
 
 # Validaciones y utilidades
-python-decouple==3.8  # Versión corregida (3.9 no existe)
+python-decouple==3.8
 python-dateutil==2.9.0.post0
 
-# Testing (opcional: elimínalos si no son necesarios en producción)
-pytest==8.3.4
-pytest-django==4.9.0
-factory-boy==3.3.2
-
-# Documentación API (opcional)
+# Documentación API
 drf-spectacular==0.28.0
 
-# Producción - Render
+# Producción
 gunicorn==23.0.0
 whitenoise==6.8.2
