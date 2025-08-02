@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import psycopg2.extensions
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -70,20 +71,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Backend.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tiendadb',
-        'USER': 'productos',
-        'PASSWORD': 'migel1457',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED,
-        },
+# Configuración de base de datos
+if 'DATABASE_URL' in os.environ:
+    # Producción: usar DATABASE_URL de Render
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
-}
+    # Agregar opciones específicas para PostgreSQL
+    DATABASES['default']['OPTIONS'] = {
+        'client_encoding': 'UTF8',
+        'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED,
+    }
+else:
+    # Desarrollo: usar configuración local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'tiendadb',
+            'USER': 'productos',
+            'PASSWORD': 'migel1457',
+            'HOST': 'localhost',
+            'PORT': '5432',
+            'OPTIONS': {
+                'client_encoding': 'UTF8',
+                'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED,
+            },
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     # Deshabilitadas para desarrollo
