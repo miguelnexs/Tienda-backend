@@ -25,30 +25,17 @@ crispy-bootstrap5==2024.10
 Pillow==11.3.0
 
 # Validaciones y utilidades
-python-decouple==3.9
+python-decouple==3.8  # Versión corregida (3.9 no existe)
 python-dateutil==2.9.0.post0
 
-# Testing
+# Testing (opcional: elimínalos si no son necesarios en producción)
 pytest==8.3.4
 pytest-django==4.9.0
 factory-boy==3.3.2
 
-# Documentación API
+# Documentación API (opcional)
 drf-spectacular==0.28.0
-drf-spectacular[sidecar]==0.28.0
-
-# Calidad de código
-flake8==7.1.2
-black==25.1.1
-isort==5.13.3
-
-# Desarrollo
-django-debug-toolbar==4.7.0
 
 # Producción - Render
 gunicorn==23.0.0
 whitenoise==6.8.2
-dj-database-url==3.0.1
-python-dotenv==1.0.1
-
-
