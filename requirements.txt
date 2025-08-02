@@ -22,7 +22,7 @@ django-crispy-forms==2.4
 crispy-bootstrap5==2024.10
 
 # Imágenes
-pip install Pillow==11.3.0
+Pillow==11.3.0
 
 # Validaciones y utilidades
 python-decouple==3.9
