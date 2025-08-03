@@ -6,15 +6,6 @@ from colorfield.fields import ColorField
 from categorias.models import CategoriaProducto  # Importamos desde la nueva app
 
 
-def get_cloudinary_storage():
-    """Obtiene el storage de Cloudinary solo si está disponible"""
-    try:
-        from cloudinary_storage.storage import MediaCloudinaryStorage
-        return MediaCloudinaryStorage()
-    except (ImportError, Exception):
-        return None
-
-
 class Producto(models.Model):
     """
     Modelo principal para productos del catálogo
@@ -58,8 +49,7 @@ class Producto(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Imagen principal"),
-        help_text=_("Imagen destacada del producto"),
-        storage=get_cloudinary_storage()
+        help_text=_("Imagen destacada del producto")
     )
 
     
@@ -479,8 +469,7 @@ class ImagenProducto(models.Model):
     imagen = models.ImageField(
         upload_to='productos/colores/',
         verbose_name=_("Imagen"),
-        help_text=_("Imagen del producto en este color"),
-        storage=get_cloudinary_storage()
+        help_text=_("Imagen del producto en este color")
     )
     
     orden = models.PositiveIntegerField(

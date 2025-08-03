@@ -4,15 +4,6 @@ from django.utils.text import slugify
 import os
 
 
-def get_cloudinary_storage():
-    """Obtiene el storage de Cloudinary solo si está disponible"""
-    try:
-        from cloudinary_storage.storage import MediaCloudinaryStorage
-        return MediaCloudinaryStorage()
-    except (ImportError, Exception):
-        return None
-
-
 class CategoriaProducto(models.Model):
     """
     Modelo para categorías de productos
@@ -42,8 +33,7 @@ class CategoriaProducto(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Imagen de la categoría"),
-        help_text=_("Imagen representativa de la categoría"),
-        storage=get_cloudinary_storage()
+        help_text=_("Imagen representativa de la categoría")
     )
     
     activa = models.BooleanField(
