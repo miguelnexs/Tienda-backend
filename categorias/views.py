@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.text import slugify
 from django.core.files.images import get_image_dimensions
 from categorias.models import CategoriaProducto
-from categorias.serializers import CategoriaSerializer
+from categorias.serializers import CategoriaProductoSerializer
 import os
 import logging
 
@@ -17,7 +17,7 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     Vista completa para categorías (CRUD)
     """
     queryset = CategoriaProducto.objects.all()
-    serializer_class = CategoriaSerializer
+    serializer_class = CategoriaProductoSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
     search_fields = ['nombre', 'descripcion']
     filterset_fields = ['activa']

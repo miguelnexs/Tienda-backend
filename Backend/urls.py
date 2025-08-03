@@ -50,7 +50,7 @@ if settings.DEBUG:
     #     path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     # ]
     
-    # Debug Toolbar (opcional)
-    urlpatterns += [
-        path('__debug__/', include('debug_toolbar.urls')),
-    ]
+    # Debug Toolbar (comentado temporalmente para evitar problemas en producción)
+    # urlpatterns += [
+    #     path('__debug__/', include('debug_toolbar.urls')),
+    # ]

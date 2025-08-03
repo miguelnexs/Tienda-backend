@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'nested_admin',
-    'debug_toolbar',
+    # 'debug_toolbar',  # Comentado temporalmente para producción
     'cloudinary_storage',
     
     # Local apps
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'categorias',
     'ventas',
     'pedidos',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +61,8 @@ MIDDLEWARE = [
 
 # Agregar debug toolbar solo en desarrollo
 if DEBUG:
-    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    # MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')  # Comentado temporalmente para producción
+    pass
 
 ROOT_URLCONF = 'Backend.urls'
 
