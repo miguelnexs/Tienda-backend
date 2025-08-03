@@ -52,6 +52,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Agregar debug toolbar solo en desarrollo
+if DEBUG:
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+
 ROOT_URLCONF = 'Backend.urls'
 
 TEMPLATES = [
@@ -125,7 +129,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_CREDENTIALS = True
 
-# Orígenes permitidos para CORS
+# Orígenes permitidos para CORS (para casos específicos)
+# Como CORS_ALLOW_ALL_ORIGINS = True, esto se usa solo como referencia
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",    # React por defecto
     "http://127.0.0.1:3000",
@@ -133,8 +138,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://localhost:5173",    # Vite por defecto
     "http://127.0.0.1:5173",
-    "file://",                  # Aplicaciones Electron
-    "app://",                   # Aplicaciones Electron alternativo
 ]
 
 # Métodos HTTP permitidos por CORS
