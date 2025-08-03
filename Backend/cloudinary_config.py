@@ -16,13 +16,20 @@ def configure_cloudinary():
     api_secret = os.environ.get('CLOUDINARY_API_SECRET')
     
     if all([cloud_name, api_key, api_secret]):
-        cloudinary.config(
-            cloud_name=cloud_name,
-            api_key=api_key,
-            api_secret=api_secret
-        )
-        return True
-    return False
+        try:
+            cloudinary.config(
+                cloud_name=cloud_name,
+                api_key=api_key,
+                api_secret=api_secret
+            )
+            print(f"✅ Cloudinary configurado: {cloud_name}")
+            return True
+        except Exception as e:
+            print(f"❌ Error configurando Cloudinary: {e}")
+            return False
+    else:
+        print("❌ Variables de entorno de Cloudinary no configuradas")
+        return False
 
 def is_cloudinary_configured():
     """

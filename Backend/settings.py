@@ -169,6 +169,14 @@ if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
     # Configurar Cloudinary desde el archivo específico
     from .cloudinary_config import configure_cloudinary
     configure_cloudinary()
+    
+    # Forzar configuración de Cloudinary en desarrollo también
+    if not 'RENDER' in os.environ:
+        print("🔧 Configurando Cloudinary en desarrollo local...")
+        
+    # Importar y configurar el storage de Cloudinary
+    from cloudinary_storage.storage import MediaCloudinaryStorage
+    default_storage = MediaCloudinaryStorage()
 else:
     # Configuración local para desarrollo sin Cloudinary
     MEDIA_URL = '/media/'
