@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'categorias',
     'ventas',
     'pedidos',
-    'drf_spectacular',
+    # 'drf_spectacular',  # Comentado temporalmente para evitar problemas
 ]
 
 MIDDLEWARE = [

@@ -7,7 +7,7 @@ from PIL import Image
 from django.db.models import Q
 from django.utils import timezone
 from django.core.files.base import ContentFile
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -29,27 +29,9 @@ class ProductoViewSet(viewsets.ModelViewSet):
         'variantes',
     ).order_by('-fecha_creacion')
     serializer_class = ProductoSerializer
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
     lookup_field = 'slug'
     parser_classes = (MultiPartParser, FormParser, JSONParser)
-
-    # Configuración de filtros y búsqueda
-    search_fields = ['nombre', 'descripcion_corta', 'descripcion_larga', 'sku']
-    filterset_fields = {
-        'estado': ['exact', 'in'],
-        'categoria': ['exact'],
-        'tipo': ['exact', 'in'],
-        'gestion_stock': ['exact'],
-        'precio': ['exact', 'gte', 'lte'],
-        'precio_comparacion': ['exact', 'gte', 'lte', 'isnull'],
-        'fecha_creacion': ['date', 'date__gte', 'date__lte'],
-        'fecha_publicacion': ['date', 'date__gte', 'date__lte'],
-    }
-    ordering_fields = [
-        'precio', 'fecha_creacion', 'nombre', 
-        'stock', 'vendidos', 'fecha_publicacion'
-    ]
-    ordering = ['-fecha_creacion']
+    permission_classes = []
 
     def get_queryset(self):
         """

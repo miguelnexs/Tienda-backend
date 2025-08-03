@@ -21,10 +21,10 @@ router.register(r'productos', ProductoViewSet, basename='producto')
 router.register(r'variantes', VarianteProductoViewSet, basename='variante')
 
 urlpatterns = [
-    # Custom image upload endpoints
-    path('productos/<slug:slug>/upload_imagen_principal/', 
-         ProductoViewSet.as_view({'post': 'upload_imagen_principal'}), 
-         name='producto-upload-imagen-principal'),
+    # Debug endpoint
+    path('debug/environment/', 
+         debug_environment, 
+         name='debug-environment'),
     
     # Colores endpoints
     path('productos/<int:producto_id>/colores/', 
@@ -54,11 +54,6 @@ urlpatterns = [
     path('productos/<int:producto_id>/colores-publico/', 
          colores_producto_publico, 
          name='colores-producto-publico'),
-    
-    # Debug endpoint
-    path('debug/environment/', 
-         debug_environment, 
-         name='debug-environment'),
     
     # Include routers
     path('', include(router.urls)),

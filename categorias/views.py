@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status, filters, serializers
+from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -16,15 +16,11 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     """
     Vista completa para categorías (CRUD)
     """
-    queryset = CategoriaProducto.objects.all()
+    queryset = CategoriaProducto.objects.all().order_by('orden', 'nombre')
     serializer_class = CategoriaProductoSerializer
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
-    search_fields = ['nombre', 'descripcion']
-    filterset_fields = ['activa']
-    ordering_fields = ['orden', 'nombre']
-    ordering = ['orden', 'nombre']
     lookup_field = 'slug'
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+    permission_classes = []
 
     def create(self, request, *args, **kwargs):
         """Crear categoría con mejor manejo de errores"""
@@ -32,24 +28,17 @@ class CategoriaViewSet(viewsets.ModelViewSet):
             logger.info(f"Creando categoría con datos: {request.data}")
             logger.info(f"Archivos recibidos: {request.FILES}")
             
-            # Debug: verificar datos recibidos
-            print("Vista: Datos recibidos:", request.data)
-            print("Vista: Archivos recibidos:", request.FILES)
-            
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
                 logger.info("Vista: Serializer válido")
-                print("Vista: Serializer válido")
                 self.perform_create(serializer)
                 headers = self.get_success_headers(serializer.data)
                 return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
             else:
                 logger.error(f"Errores de validación: {serializer.errors}")
-                print("Vista: Errores de validación:", serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(f"Error al crear categoría: {str(e)}")
-            print(f"Vista: Error al crear categoría: {str(e)}")
             return Response(
                 {"error": f"Error interno del servidor: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -154,7 +143,8 @@ class CategoriaViewSet(viewsets.ModelViewSet):
         except serializers.ValidationError as e:
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            logger.error(f"Error al subir imagen: {str(e)}")
             return Response(
-                {"error": f"Error al procesar la imagen: {str(e)}"},
+                {"error": f"Error interno del servidor: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
