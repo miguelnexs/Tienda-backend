@@ -1,6 +1,12 @@
 from pathlib import Path
 import os
 import psycopg2.extensions
+import dj_database_url
+
+# Cloudinary configuration
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,6 +36,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'nested_admin',
     'debug_toolbar',
+    'cloudinary_storage',
     
     # Local apps
     'productos.apps.ProductosConfig',
@@ -44,11 +51,16 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # CSRF deshabilitado para APIs - se maneja por authentication
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Agregar debug toolbar solo en desarrollo
+if DEBUG:
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'Backend.urls'
 
@@ -70,20 +82,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Backend.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tiendadb',
-        'USER': 'productos',
-        'PASSWORD': 'migel1457',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED,
-        },
+# Configuración de base de datos
+if 'DATABASE_URL' in os.environ:
+    # Producción: usar DATABASE_URL de Render
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
-}
+    # Agregar opciones específicas para PostgreSQL
+    DATABASES['default']['OPTIONS'] = {
+        'client_encoding': 'UTF8',
+        'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED,
+    }
+else:
+    # Desarrollo: usar configuración local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'tiendadb',
+            'USER': 'productos',
+            'PASSWORD': 'migel1457',
+            'HOST': 'localhost',
+            'PORT': '5432',
+            'OPTIONS': {
+                'client_encoding': 'UTF8',
+                'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED,
+            },
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     # Deshabilitadas para desarrollo
@@ -99,24 +124,55 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Configuración de archivos estáticos y media
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloudinary configuration para producción
+if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+    # Configuración de Cloudinary para producción o desarrollo con variables configuradas
+    CLOUDINARY = {
+        'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'api_key': os.environ.get('CLOUDINARY_API_KEY'),
+        'api_secret': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+    
+    # Configurar Cloudinary
+    cloudinary.config(
+        cloud_name=CLOUDINARY['cloud_name'],
+        api_key=CLOUDINARY['api_key'],
+        api_secret=CLOUDINARY['api_secret']
+    )
+    
+    # Usar Cloudinary para archivos media en producción
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    # Configuración local para desarrollo sin Cloudinary
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuración CORS para desarrollo local
+# Configuración CORS para desarrollo y producción
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_CREDENTIALS = True
+
+# Orígenes permitidos para CORS (para casos específicos)
+# Como CORS_ALLOW_ALL_ORIGINS = True, esto se usa solo como referencia
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React por defecto
+    "http://localhost:3000",    # React por defecto
     "http://127.0.0.1:3000",
-    "http://localhost:8080",  # Vue por defecto
+    "http://localhost:8080",    # Vue por defecto
     "http://127.0.0.1:8080",
-    "http://localhost:5173",  # Vite por defecto
+    "http://localhost:5173",    # Vite por defecto
     "http://127.0.0.1:5173",
 ]
+
+# Métodos HTTP permitidos por CORS
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -124,6 +180,20 @@ CORS_ALLOW_METHODS = [
     'PATCH',
     'POST',
     'PUT',
+]
+
+# Headers permitidos por CORS
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cache-control',
 ]
 
 # Si usas WhiteNoise para servir archivos estáticos/media en producción:

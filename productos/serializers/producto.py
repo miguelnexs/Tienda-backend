@@ -79,7 +79,12 @@ class ProductoSerializer(serializers.ModelSerializer):
             try:
                 request = self.context.get('request')
                 if request is not None:
-                    return request.build_absolute_uri(obj.imagen_principal.url)
+                    # Si estamos en producción (Render), usar URL directa de Cloudinary
+                    if 'RENDER' in os.environ:
+                        return obj.imagen_principal.url
+                    else:
+                        # En desarrollo, construir URL absoluta
+                        return request.build_absolute_uri(obj.imagen_principal.url)
                 return obj.imagen_principal.url
             except Exception as e:
                 print(f"Error generando URL para imagen de {obj.nombre}: {str(e)}")

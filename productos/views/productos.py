@@ -162,9 +162,14 @@ class ProductoViewSet(viewsets.ModelViewSet):
             response_data = serializer.data
             # Asegurar que la URL de la imagen esté incluida
             if producto.imagen_principal:
-                response_data['imagen_principal_url'] = request.build_absolute_uri(
-                    producto.imagen_principal.url
-                )
+                # En producción (Render), usar URL directa de Cloudinary
+                if 'RENDER' in os.environ:
+                    response_data['imagen_principal_url'] = producto.imagen_principal.url
+                else:
+                    # En desarrollo, construir URL absoluta
+                    response_data['imagen_principal_url'] = request.build_absolute_uri(
+                        producto.imagen_principal.url
+                    )
             logger.info(f"[upload_imagen_principal] Respuesta exitosa: {response_data}")
             return Response(
                 response_data,

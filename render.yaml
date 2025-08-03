@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: tienda-backend-api
+    runtime: python3
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Backend.wsgi:application"
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tienda-db
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: Backend.settings
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+databases:
+  - name: tienda-db
+    databaseName: tienda_production
+    user: tienda_user
+    plan: free
+
+buildCommand: |
+  pip install --upgrade pip
+  pip install -r requirements.txt
+  python manage.py collectstatic --noinput
+  python manage.py migrate 
