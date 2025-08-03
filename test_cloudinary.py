@@ -9,6 +9,11 @@ import sys
 import django
 from pathlib import Path
 
+# Configurar variables de entorno con las credenciales correctas
+os.environ['CLOUDINARY_CLOUD_NAME'] = 'do1ntnlop'
+os.environ['CLOUDINARY_API_KEY'] = '117225377115856'
+os.environ['CLOUDINARY_API_SECRET'] = 'e0YSrk3sT_70-ijM6mwdFBIWP9w'
+
 # Configurar Django
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.append(str(BASE_DIR))

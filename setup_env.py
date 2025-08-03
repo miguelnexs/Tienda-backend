@@ -9,8 +9,8 @@ def setup_cloudinary_env():
     """Configura las variables de entorno de Cloudinary"""
     print("🔧 Configurando variables de entorno de Cloudinary...")
     
-    # Configurar variables de entorno
-    os.environ['CLOUDINARY_CLOUD_NAME'] = 'mediaflows_4bc5a48b-2274-4a45-99b2-d05a4519862f'
+    # Configurar variables de entorno con las credenciales correctas
+    os.environ['CLOUDINARY_CLOUD_NAME'] = 'do1ntnlop'
     os.environ['CLOUDINARY_API_KEY'] = '117225377115856'
     os.environ['CLOUDINARY_API_SECRET'] = 'e0YSrk3sT_70-ijM6mwdFBIWP9w'
     

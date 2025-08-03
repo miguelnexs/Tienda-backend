@@ -131,8 +131,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Cloudinary configuration para producción
-if 'RENDER' in os.environ:
-    # Configuración de Cloudinary para producción
+if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+    # Configuración de Cloudinary para producción o desarrollo con variables configuradas
     CLOUDINARY = {
         'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME'),
         'api_key': os.environ.get('CLOUDINARY_API_KEY'),
@@ -150,7 +150,7 @@ if 'RENDER' in os.environ:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'
 else:
-    # Configuración local para desarrollo
+    # Configuración local para desarrollo sin Cloudinary
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 

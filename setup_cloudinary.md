@@ -9,13 +9,6 @@
 Cloudinary es un servicio de almacenamiento en la nube que soluciona este problema.
 
 ---
-Key Name = mediaflows_4bc5a48b-2274-4a45-99b2-d05a4519862f
-
-
-API KEY = 117225377115856
-
-API Secret = e0YSrk3sT_70-ijM6mwdFBIWP9w
-
 
 ## 🔧 Pasos para Configurar Cloudinary
 
@@ -38,9 +31,9 @@ API Secret = e0YSrk3sT_70-ijM6mwdFBIWP9w
 4. Agrega estas 3 variables:
 
 ```
-CLOUDINARY_CLOUD_NAME=tu_cloud_name_aqui
-CLOUDINARY_API_KEY=tu_api_key_aqui
-CLOUDINARY_API_SECRET=tu_api_secret_aqui
+CLOUDINARY_CLOUD_NAME=do1ntnlop
+CLOUDINARY_API_KEY=117225377115856
+CLOUDINARY_API_SECRET=e0YSrk3sT_70-ijM6mwdFBIWP9w
 ```
 
 ### **Paso 4: Redesplegar**
@@ -61,6 +54,12 @@ CLOUDINARY_API_SECRET=tu_api_secret_aqui
 ```bash
 cd Backend
 python test_cloudinary.py
+```
+
+### **Probar subida de imágenes:**
+```bash
+cd Backend
+python test_image_upload.py
 ```
 
 ### **Migrar imágenes existentes (solo en producción):**
@@ -95,7 +94,7 @@ https://tienda-backend-api.onrender.com/media/productos/imagen.jpg
 
 ### **Después:**
 ```
-https://res.cloudinary.com/tu_cloud_name/image/upload/v1234567890/productos/imagen.jpg
+https://res.cloudinary.com/do1ntnlop/image/upload/v1234567890/productos/imagen.jpg
 ```
 
 ---
