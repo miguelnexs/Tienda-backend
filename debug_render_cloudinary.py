@@ -12,7 +12,7 @@ def test_cloudinary_debug():
     print("🔍 Debuggeando Cloudinary en Render...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     # Ruta de la imagen
     image_path = r"D:\usuario\Downloads\bolso\0fbfa4d6-958d-42c1-9db7-8c87784d28e6.jpg"
@@ -106,7 +106,7 @@ def check_render_logs():
     print("\n📋 Verificando logs de Render...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         # Hacer una petición simple para verificar el estado

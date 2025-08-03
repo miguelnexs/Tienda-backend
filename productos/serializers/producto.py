@@ -79,8 +79,9 @@ class ProductoSerializer(serializers.ModelSerializer):
             try:
                 request = self.context.get('request')
                 if request is not None:
-                    # Si estamos en producción (Render), usar URL directa de Cloudinary
-                    if 'RENDER' in os.environ:
+                    # Si estamos en producción (Render) o tenemos Cloudinary configurado
+                    if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+                        # Usar URL directa de Cloudinary
                         return obj.imagen_principal.url
                     else:
                         # En desarrollo, construir URL absoluta

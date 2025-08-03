@@ -162,8 +162,8 @@ class ProductoViewSet(viewsets.ModelViewSet):
             response_data = serializer.data
             # Asegurar que la URL de la imagen esté incluida
             if producto.imagen_principal:
-                # En producción (Render), usar URL directa de Cloudinary
-                if 'RENDER' in os.environ:
+                # En producción (Render) o con Cloudinary configurado, usar URL directa
+                if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
                     response_data['imagen_principal_url'] = producto.imagen_principal.url
                 else:
                     # En desarrollo, construir URL absoluta
@@ -387,9 +387,14 @@ class ProductoViewSet(viewsets.ModelViewSet):
             # Construir respuesta
             response_data = self.get_serializer(producto).data
             if producto.imagen_principal:
-                response_data['imagen_url'] = request.build_absolute_uri(
-                    producto.imagen_principal.url
-                )
+                # En producción (Render) o con Cloudinary configurado, usar URL directa
+                if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+                    response_data['imagen_url'] = producto.imagen_principal.url
+                else:
+                    # En desarrollo, construir URL absoluta
+                    response_data['imagen_url'] = request.build_absolute_uri(
+                        producto.imagen_principal.url
+                    )
             
             headers = self.get_success_headers(serializer.data)
             return Response(
@@ -429,9 +434,14 @@ class ProductoViewSet(viewsets.ModelViewSet):
             # Construir respuesta
             response_data = self.get_serializer(producto).data
             if producto.imagen_principal:
-                response_data['imagen_url'] = request.build_absolute_uri(
-                    producto.imagen_principal.url
-                )
+                # En producción (Render) o con Cloudinary configurado, usar URL directa
+                if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+                    response_data['imagen_url'] = producto.imagen_principal.url
+                else:
+                    # En desarrollo, construir URL absoluta
+                    response_data['imagen_url'] = request.build_absolute_uri(
+                        producto.imagen_principal.url
+                    )
             
             return Response(response_data)
         except Exception as e:

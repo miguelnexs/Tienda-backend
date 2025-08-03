@@ -177,11 +177,37 @@ class ColorProductoListSerializer(serializers.ModelSerializer):
         """
         imagen_principal = obj.imagenes.filter(es_principal=True).first()
         if imagen_principal:
-            return imagen_principal.url_imagen
+            try:
+                request = self.context.get('request')
+                if request is not None:
+                    # Si estamos en producción (Render) o tenemos Cloudinary configurado
+                    if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+                        # Usar URL directa de Cloudinary
+                        return imagen_principal.imagen.url
+                    else:
+                        # En desarrollo, construir URL absoluta
+                        return request.build_absolute_uri(imagen_principal.imagen.url)
+                return imagen_principal.imagen.url
+            except Exception as e:
+                print(f"Error generando URL para imagen de color {obj.nombre}: {str(e)}")
+                return None
         
         # Si no hay imagen principal, devolver la primera
         primera_imagen = obj.imagenes.first()
         if primera_imagen:
-            return primera_imagen.url_imagen
+            try:
+                request = self.context.get('request')
+                if request is not None:
+                    # Si estamos en producción (Render) o tenemos Cloudinary configurado
+                    if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+                        # Usar URL directa de Cloudinary
+                        return primera_imagen.imagen.url
+                    else:
+                        # En desarrollo, construir URL absoluta
+                        return request.build_absolute_uri(primera_imagen.imagen.url)
+                return primera_imagen.imagen.url
+            except Exception as e:
+                print(f"Error generando URL para imagen de color {obj.nombre}: {str(e)}")
+                return None
         
         return None 

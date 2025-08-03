@@ -14,7 +14,7 @@ def test_render_upload():
     print("🌐 Probando subida a la API de Render...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     # Ruta de la imagen
     image_path = r"D:\usuario\Downloads\bolso\0fbfa4d6-958d-42c1-9db7-8c87784d28e6.jpg"
@@ -95,7 +95,7 @@ def test_render_products():
     print("\n🔍 Probando productos existentes en Render...")
     
     # URL para obtener productos
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         response = requests.get(api_url, timeout=30)
@@ -136,7 +136,7 @@ def test_render_health():
     
     try:
         # Probar endpoint de salud (si existe)
-        health_url = "https://tienda-backend-api.onrender.com/"
+        health_url = "https://tienda-backend-ap-api.onrender.com/"
         response = requests.get(health_url, timeout=10)
         
         print(f"📡 Status Code: {response.status_code}")

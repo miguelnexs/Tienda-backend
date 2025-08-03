@@ -10,7 +10,7 @@ def check_render_status():
     """Verificar el estado de la API en Render"""
     print("🔍 Verificando estado de Render...")
     
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         # Hacer una petición simple para verificar el estado
@@ -42,7 +42,7 @@ def check_environment_variables():
     # Hacer una petición a un endpoint que nos dé información sobre la configuración
     try:
         # Intentar obtener información de configuración
-        response = requests.get("https://tienda-backend-api.onrender.com/api/", timeout=10)
+        response = requests.get("https://tienda-backend-ap-api.onrender.com/api/", timeout=10)
         
         if response.status_code == 200:
             print("✅ API responde correctamente")
@@ -61,7 +61,7 @@ def force_redeploy_check():
     # Hacer múltiples peticiones para ver si hay cambios
     for i in range(3):
         try:
-            response = requests.get("https://tienda-backend-api.onrender.com/api/productos/productos/", timeout=5)
+            response = requests.get("https://tienda-backend-ap-api.onrender.com/api/productos/productos/", timeout=5)
             print(f"📡 Petición {i+1}: Status {response.status_code}")
             time.sleep(2)
         except Exception as e:

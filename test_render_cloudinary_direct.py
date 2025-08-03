@@ -12,7 +12,7 @@ def test_cloudinary_direct():
     print("☁️ Probando Cloudinary directamente en Render...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     # Crear datos únicos
     unique_id = str(uuid.uuid4())[:8]
@@ -69,7 +69,7 @@ def test_cloudinary_with_image():
     print("\n📸 Probando Cloudinary con imagen...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     # Ruta de la imagen
     image_path = r"D:\usuario\Downloads\bolso\0fbfa4d6-958d-42c1-9db7-8c87784d28e6.jpg"
@@ -143,7 +143,7 @@ def check_latest_products():
     """Verificar los productos más recientes"""
     print("\n🔍 Verificando productos más recientes...")
     
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         response = requests.get(api_url, timeout=10)

@@ -93,7 +93,7 @@ TIME_ZONE=America/Mexico_City
 
 Una vez desplegado, tu API estará disponible en:
 ```
-https://tienda-backend-api.onrender.com/
+https://tienda-backend-ap-api.onrender.com/
 ```
 
 ### Endpoints principales:

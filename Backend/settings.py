@@ -148,7 +148,27 @@ if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
     
     # Usar Cloudinary para archivos media en producción
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Configuración adicional para Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY['cloud_name'],
+        'API_KEY': CLOUDINARY['api_key'],
+        'API_SECRET': CLOUDINARY['api_secret'],
+        'STATIC_TAG': 'static',
+        'MEDIA_TAG': 'media',
+        'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'svg', 'svgz', 'ico'],
+        'MAGIC_FILE_PATH': 'magic',
+        'STATICFILES_MANIFEST_ROOT': BASE_DIR / 'staticfiles',
+        'STATICFILES_STORAGE': 'cloudinary_storage.storage.StaticHashedCloudinaryStorage',
+    }
+    
+    # Configurar MEDIA_URL para Cloudinary
     MEDIA_URL = '/media/'
+    
+    # Configurar Cloudinary desde el archivo específico
+    from .cloudinary_config import configure_cloudinary
+    configure_cloudinary()
 else:
     # Configuración local para desarrollo sin Cloudinary
     MEDIA_URL = '/media/'
@@ -170,6 +190,34 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://localhost:5173",    # Vite por defecto
     "http://127.0.0.1:5173",
+    "https://tienda-backend-ap-api.onrender.com/",  # Render backend
+    "https://sobrio-estilo-tienda-main.vercel.app",  # Frontend en Vercel
+]
+
+# Configuración específica para subidas de archivos
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Headers permitidos para subidas de archivos
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cache-control',
+    'content-disposition',  # Para subidas de archivos
+    'content-length',       # Para subidas de archivos
 ]
 
 # Métodos HTTP permitidos por CORS

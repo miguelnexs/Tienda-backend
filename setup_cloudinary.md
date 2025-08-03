@@ -89,7 +89,7 @@ python migrate_images_to_cloudinary.py
 
 ### **Antes:**
 ```
-https://tienda-backend-api.onrender.com/media/productos/imagen.jpg
+https://tienda-backend-ap-api.onrender.com/media/productos/imagen.jpg
 ```
 
 ### **Después:**

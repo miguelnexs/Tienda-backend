@@ -14,7 +14,7 @@ def test_cors_upload():
     print("🌐 Probando subida con configuración de CORS...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     # Ruta de la imagen
     image_path = r"D:\usuario\Downloads\bolso\0fbfa4d6-958d-42c1-9db7-8c87784d28e6.jpg"
@@ -144,7 +144,7 @@ def test_cors_preflight():
     """Probar preflight request de CORS"""
     print("\n🔍 Probando preflight request de CORS...")
     
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         # Hacer una petición OPTIONS (preflight)
@@ -173,7 +173,7 @@ def test_simple_get():
     """Probar una petición GET simple"""
     print("\n🔍 Probando petición GET simple...")
     
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         response = requests.get(api_url, timeout=10)

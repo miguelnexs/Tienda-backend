@@ -11,7 +11,7 @@ def test_render_environment():
     print("🔍 Verificando variables de entorno en Render...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         # Hacer una petición simple para verificar el estado
@@ -45,7 +45,7 @@ def test_simple_product_creation():
     print("\n📦 Probando creación de producto simple...")
     
     # URL de la API en Render
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     # Datos del producto simple
     product_data = {
@@ -102,7 +102,7 @@ def check_latest_products():
     """Verificar los productos más recientes"""
     print("\n🔍 Verificando productos más recientes...")
     
-    api_url = "https://tienda-backend-api.onrender.com/api/productos/productos/"
+    api_url = "https://tienda-backend-ap-api.onrender.com/api/productos/productos/"
     
     try:
         response = requests.get(api_url, timeout=10)
