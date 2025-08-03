@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class CategoriaBase(models.Model):
     """
@@ -42,7 +43,8 @@ class CategoriaBase(models.Model):
         upload_to='categorias/',
         blank=True,
         null=True,
-        verbose_name=_("Imagen representativa")
+        verbose_name=_("Imagen representativa"),
+        storage=MediaCloudinaryStorage()
     )
 
     class Meta:

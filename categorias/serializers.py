@@ -21,8 +21,14 @@ class CategoriaSerializer(serializers.ModelSerializer):
     def get_imagen_url(self, obj):
         if obj.imagen:
             request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.imagen.url)
+            if request is not None:
+                # Si estamos en producción (Render) o tenemos Cloudinary configurado
+                if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
+                    # Usar URL directa de Cloudinary
+                    return obj.imagen.url
+                else:
+                    # En desarrollo, construir URL absoluta
+                    return request.build_absolute_uri(obj.imagen.url)
             return obj.imagen.url
         return None
     
@@ -42,8 +48,10 @@ class CategoriaSerializer(serializers.ModelSerializer):
                 "stock_total_calculado": self._calcular_stock_total(p),
                 "estado": p.estado,
                 "imagen_principal_url": (
-                    request.build_absolute_uri(p.imagen_principal.url)
-                    if p.imagen_principal and (p.imagen_principal.url if p.imagen_principal else None)
+                    p.imagen_principal.url
+                    if p.imagen_principal and ('RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'))
+                    else request.build_absolute_uri(p.imagen_principal.url)
+                    if p.imagen_principal and request
                     else None
                 ),
             }

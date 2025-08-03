@@ -176,7 +176,9 @@ if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
         
     # Importar y configurar el storage de Cloudinary
     from cloudinary_storage.storage import MediaCloudinaryStorage
-    default_storage = MediaCloudinaryStorage()
+    # Forzar el uso de MediaCloudinaryStorage
+    import django.core.files.storage
+    django.core.files.storage.default_storage = MediaCloudinaryStorage()
 else:
     # Configuración local para desarrollo sin Cloudinary
     MEDIA_URL = '/media/'

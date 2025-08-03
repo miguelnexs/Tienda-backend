@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator
 from colorfield.fields import ColorField
 from categorias.models import CategoriaProducto  # Importamos desde la nueva app
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class Producto(models.Model):
     """
@@ -48,7 +49,8 @@ class Producto(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Imagen principal"),
-        help_text=_("Imagen destacada del producto")
+        help_text=_("Imagen destacada del producto"),
+        storage=MediaCloudinaryStorage()
     )
 
     
@@ -468,7 +470,8 @@ class ImagenProducto(models.Model):
     imagen = models.ImageField(
         upload_to='productos/colores/',
         verbose_name=_("Imagen"),
-        help_text=_("Imagen del producto en este color")
+        help_text=_("Imagen del producto en este color"),
+        storage=MediaCloudinaryStorage()
     )
     
     orden = models.PositiveIntegerField(
