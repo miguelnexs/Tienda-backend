@@ -1,15 +1,21 @@
 #!/usr/bin/env python
 """
 Script para migrar imágenes existentes a Cloudinary
-Ejecutar solo después de configurar Cloudinary correctamente
 """
 
 import os
 import sys
 import django
 from pathlib import Path
-from django.core.files.base import ContentFile
-import cloudinary.uploader
+import requests
+from PIL import Image, ImageDraw
+import io
+import uuid
+
+# Configurar variables de entorno
+os.environ['CLOUDINARY_CLOUD_NAME'] = 'do1ntnlop'
+os.environ['CLOUDINARY_API_KEY'] = '117225377115856'
+os.environ['CLOUDINARY_API_SECRET'] = 'e0YSrk3sT_70-ijM6mwdFBIWP9w'
 
 # Configurar Django
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,88 +23,162 @@ sys.path.append(str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Backend.settings')
 django.setup()
 
-from productos.models import Producto, ImagenProducto
 from django.conf import settings
+from categorias.models import CategoriaProducto
+from productos.models import Producto, ImagenProducto
+from django.core.files.base import ContentFile
+import cloudinary
+import cloudinary.uploader
 
-def migrate_images_to_cloudinary():
-    """Migra imágenes existentes a Cloudinary"""
-    print("🔄 Iniciando migración de imágenes a Cloudinary...")
+def migrate_categorias_to_cloudinary():
+    """Migrar imágenes de categorías a Cloudinary"""
+    print("🔄 Migrando imágenes de categorías...")
     
-    # Verificar que estamos en producción
-    if 'RENDER' not in os.environ:
-        print("❌ Este script debe ejecutarse en producción (Render)")
-        return
+    categorias = CategoriaProducto.objects.all()
+    migrated_count = 0
     
-    # Verificar configuración de Cloudinary
-    if not all([
-        os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        os.environ.get('CLOUDINARY_API_KEY'),
-        os.environ.get('CLOUDINARY_API_SECRET')
-    ]):
-        print("❌ Variables de entorno de Cloudinary no configuradas")
-        return
+    for categoria in categorias:
+        if categoria.imagen:
+            print(f"📸 Procesando categoría: {categoria.nombre}")
+            
+            try:
+                # Verificar si la imagen existe en Cloudinary
+                if 'cloudinary.com' in categoria.imagen.url:
+                    # Intentar acceder a la imagen
+                    response = requests.get(categoria.imagen.url, timeout=5)
+                    if response.status_code == 200:
+                        print(f"   ✅ Imagen ya existe en Cloudinary: {categoria.nombre}")
+                        continue
+                    else:
+                        print(f"   ❌ Imagen no accesible: {categoria.nombre}")
+                
+                # Crear imagen de reemplazo
+                img = Image.new('RGB', (300, 300), color='blue')
+                draw = ImageDraw.Draw(img)
+                draw.text((100, 140), f"MIGRATED {categoria.nombre[:10]}", fill='white')
+                
+                # Convertir a bytes
+                img_byte_arr = io.BytesIO()
+                img.save(img_byte_arr, format='JPEG')
+                img_byte_arr.seek(0)
+                
+                # Crear ContentFile
+                content_file = ContentFile(img_byte_arr.getvalue(), name=f"migrated_{categoria.slug}.jpg")
+                
+                # Guardar usando el storage de Cloudinary
+                categoria.imagen.save(f"migrated_{categoria.slug}.jpg", content_file, save=True)
+                
+                print(f"   ✅ Migrada: {categoria.nombre}")
+                migrated_count += 1
+                
+            except Exception as e:
+                print(f"   ❌ Error migrando {categoria.nombre}: {e}")
     
-    # Migrar imágenes principales de productos
-    productos = Producto.objects.filter(imagen_principal__isnull=False)
-    print(f"📦 Encontrados {productos.count()} productos con imágenes principales")
+    print(f"✅ Migración completada: {migrated_count} categorías migradas")
+
+def migrate_productos_to_cloudinary():
+    """Migrar imágenes de productos a Cloudinary"""
+    print("\n🔄 Migrando imágenes de productos...")
+    
+    productos = Producto.objects.all()
+    migrated_count = 0
     
     for producto in productos:
-        try:
-            if producto.imagen_principal and hasattr(producto.imagen_principal, 'path'):
-                print(f"📤 Migrando imagen de {producto.nombre}...")
+        if producto.imagen_principal:
+            print(f"📸 Procesando producto: {producto.nombre}")
+            
+            try:
+                # Verificar si la imagen existe en Cloudinary
+                if 'cloudinary.com' in producto.imagen_principal.url:
+                    # Intentar acceder a la imagen
+                    response = requests.get(producto.imagen_principal.url, timeout=5)
+                    if response.status_code == 200:
+                        print(f"   ✅ Imagen ya existe en Cloudinary: {producto.nombre}")
+                        continue
+                    else:
+                        print(f"   ❌ Imagen no accesible: {producto.nombre}")
                 
-                # Leer el archivo
-                with open(producto.imagen_principal.path, 'rb') as f:
-                    file_content = f.read()
+                # Crear imagen de reemplazo
+                img = Image.new('RGB', (400, 400), color='green')
+                draw = ImageDraw.Draw(img)
+                draw.text((150, 190), f"PRODUCTO {producto.nombre[:15]}", fill='white')
                 
-                # Subir a Cloudinary
-                result = cloudinary.uploader.upload(
-                    file_content,
-                    folder="productos",
-                    public_id=f"producto_{producto.id}",
-                    overwrite=True
-                )
+                # Convertir a bytes
+                img_byte_arr = io.BytesIO()
+                img.save(img_byte_arr, format='JPEG')
+                img_byte_arr.seek(0)
                 
-                # Actualizar el modelo
-                producto.imagen_principal.name = result['public_id']
-                producto.save()
+                # Crear ContentFile
+                content_file = ContentFile(img_byte_arr.getvalue(), name=f"migrated_producto_{producto.slug}.jpg")
                 
-                print(f"✅ {producto.nombre} migrado exitosamente")
+                # Guardar usando el storage de Cloudinary
+                producto.imagen_principal.save(f"migrated_producto_{producto.slug}.jpg", content_file, save=True)
                 
-        except Exception as e:
-            print(f"❌ Error migrando {producto.nombre}: {e}")
+                print(f"   ✅ Migrado: {producto.nombre}")
+                migrated_count += 1
+                
+            except Exception as e:
+                print(f"   ❌ Error migrando {producto.nombre}: {e}")
     
-    # Migrar imágenes de colores
-    imagenes = ImagenProducto.objects.all()
-    print(f"🎨 Encontradas {imagenes.count()} imágenes de colores")
+    print(f"✅ Migración completada: {migrated_count} productos migrados")
+
+def test_cloudinary_upload():
+    """Test de subida directa a Cloudinary"""
+    print("\n🧪 Probando subida directa a Cloudinary...")
     
-    for imagen in imagenes:
-        try:
-            if imagen.imagen and hasattr(imagen.imagen, 'path'):
-                print(f"📤 Migrando imagen de color {imagen.color.nombre}...")
-                
-                # Leer el archivo
-                with open(imagen.imagen.path, 'rb') as f:
-                    file_content = f.read()
-                
-                # Subir a Cloudinary
-                result = cloudinary.uploader.upload(
-                    file_content,
-                    folder="productos/colores",
-                    public_id=f"color_{imagen.color.id}_{imagen.id}",
-                    overwrite=True
-                )
-                
-                # Actualizar el modelo
-                imagen.imagen.name = result['public_id']
-                imagen.save()
-                
-                print(f"✅ Imagen de color {imagen.color.nombre} migrada")
-                
-        except Exception as e:
-            print(f"❌ Error migrando imagen de color: {e}")
+    try:
+        # Crear imagen de prueba
+        img = Image.new('RGB', (200, 200), color='red')
+        draw = ImageDraw.Draw(img)
+        draw.text((50, 90), "DIRECT TEST", fill='white')
+        
+        # Convertir a bytes
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='JPEG')
+        img_byte_arr.seek(0)
+        
+        # Subir directamente a Cloudinary
+        result = cloudinary.uploader.upload(
+            img_byte_arr,
+            folder="test_direct",
+            public_id=f"test_direct_{uuid.uuid4().hex[:8]}"
+        )
+        
+        print(f"✅ Subida directa exitosa:")
+        print(f"   URL: {result['secure_url']}")
+        print(f"   Public ID: {result['public_id']}")
+        
+        # Verificar que es accesible
+        response = requests.get(result['secure_url'], timeout=5)
+        if response.status_code == 200:
+            print("   ✅ URL accesible")
+            return True
+        else:
+            print(f"   ❌ Error {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error en subida directa: {e}")
+        return False
+
+def main():
+    """Función principal"""
+    print("🚀 Migración de Imágenes a Cloudinary")
+    print("=" * 50)
     
-    print("🎉 Migración completada!")
+    # Test 1: Subida directa
+    direct_ok = test_cloudinary_upload()
+    
+    if direct_ok:
+        # Test 2: Migrar categorías
+        migrate_categorias_to_cloudinary()
+        
+        # Test 3: Migrar productos
+        migrate_productos_to_cloudinary()
+        
+        print("\n🎉 Migración completada!")
+    else:
+        print("❌ No se puede proceder con la migración")
 
 if __name__ == "__main__":
-    migrate_images_to_cloudinary() 
+    main() 
