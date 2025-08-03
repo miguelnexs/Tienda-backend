@@ -170,19 +170,15 @@ if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
     from .cloudinary_config import configure_cloudinary
     configure_cloudinary()
     
-    # Forzar configuración de Cloudinary en desarrollo también
-    if not 'RENDER' in os.environ:
-        print("🔧 Configurando Cloudinary en desarrollo local...")
-        
-    # Importar y configurar el storage de Cloudinary
-    from cloudinary_storage.storage import MediaCloudinaryStorage
-    # Forzar el uso de MediaCloudinaryStorage
-    import django.core.files.storage
-    django.core.files.storage.default_storage = MediaCloudinaryStorage()
+    print(f"✅ Cloudinary configurado para producción: {CLOUDINARY['cloud_name']}")
 else:
     # Configuración local para desarrollo sin Cloudinary
+    print("🔧 Configuración local sin Cloudinary")
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+    
+    # Configurar storage local para desarrollo
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

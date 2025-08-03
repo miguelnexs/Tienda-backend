@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.core.files.images import get_image_dimensions
 from productos.models import Producto, ColorProducto, ImagenProducto
 from productos.serializers.color import (
     ColorProductoSerializer,
@@ -13,6 +14,10 @@ from productos.serializers.color import (
     ImagenProductoSerializer
 )
 from rest_framework import serializers
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ColorProductoListCreateView(generics.ListCreateAPIView):
@@ -98,7 +103,54 @@ class ImagenProductoListCreateView(generics.ListCreateAPIView):
                 "No se pueden agregar más de 4 imágenes por color"
             )
         
+        # Validar la imagen antes de guardar
+        imagen = self.request.FILES.get('imagen')
+        if imagen:
+            self._validate_image(imagen)
+        
         serializer.save(color=color)
+    
+    def _validate_image(self, imagen):
+        """
+        Valida la imagen antes de guardarla
+        """
+        # Validar tipo de archivo
+        allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        if imagen.content_type not in allowed_types:
+            raise serializers.ValidationError({
+                "imagen": "Tipo de archivo no permitido. Use JPEG, PNG, WEBP o GIF"
+            })
+        
+        # Validar extensión
+        valid_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
+        ext = os.path.splitext(imagen.name)[1].lower()
+        if ext not in valid_extensions:
+            raise serializers.ValidationError({
+                "imagen": "Formato de imagen no soportado. Use JPG, PNG, WEBP o GIF"
+            })
+        
+        # Validar tamaño (máximo 5MB)
+        if imagen.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError({
+                "imagen": "La imagen es demasiado grande. Máximo 5MB"
+            })
+        
+        # Validar dimensiones
+        try:
+            width, height = get_image_dimensions(imagen)
+            if width is None or height is None:
+                raise serializers.ValidationError({
+                    "imagen": "El archivo no es una imagen válida"
+                })
+            if width > 4000 or height > 4000:
+                raise serializers.ValidationError({
+                    "imagen": "La imagen es demasiado grande. Máximo 4000x4000 píxeles"
+                })
+        except Exception as e:
+            logger.error(f"Error validando imagen: {e}")
+            raise serializers.ValidationError({
+                "imagen": "El archivo no es una imagen válida"
+            })
 
 
 class ImagenProductoDetailView(generics.RetrieveUpdateDestroyAPIView):

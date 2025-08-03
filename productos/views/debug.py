@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import os
+from django.conf import settings
 
 @api_view(['GET'])
 def debug_environment(request):
@@ -18,6 +19,7 @@ def debug_environment(request):
     cloudinary_name_in_env = bool(os.environ.get('CLOUDINARY_CLOUD_NAME'))
     condition_total = render_in_env or cloudinary_name_in_env
     
+    # Obtener configuración de Django
     debug_info = {
         'variables_entorno': {
             'RENDER': render_var,
@@ -31,9 +33,15 @@ def debug_environment(request):
             'condicion_total': condition_total
         },
         'configuracion_django': {
-            'DEFAULT_FILE_STORAGE': getattr(request, 'DEFAULT_FILE_STORAGE', 'No disponible'),
-            'MEDIA_URL': getattr(request, 'MEDIA_URL', 'No disponible'),
-            'MEDIA_ROOT': str(getattr(request, 'MEDIA_ROOT', 'No disponible'))
+            'DEFAULT_FILE_STORAGE': getattr(settings, 'DEFAULT_FILE_STORAGE', 'No disponible'),
+            'MEDIA_URL': getattr(settings, 'MEDIA_URL', 'No disponible'),
+            'MEDIA_ROOT': str(getattr(settings, 'MEDIA_ROOT', 'No disponible')),
+            'DEBUG': getattr(settings, 'DEBUG', 'No disponible'),
+            'ALLOWED_HOSTS': getattr(settings, 'ALLOWED_HOSTS', 'No disponible')
+        },
+        'configuracion_cloudinary': {
+            'CLOUDINARY_STORAGE_CONFIGURED': hasattr(settings, 'CLOUDINARY_STORAGE'),
+            'CLOUDINARY_CONFIG': getattr(settings, 'CLOUDINARY', 'No configurado')
         }
     }
     
