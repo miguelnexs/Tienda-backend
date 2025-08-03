@@ -11,6 +11,7 @@ from productos.views.colores import (
     establecer_imagen_principal,
     colores_producto_publico
 )
+from productos.views.debug import debug_environment
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -53,6 +54,11 @@ urlpatterns = [
     path('productos/<int:producto_id>/colores-publico/', 
          colores_producto_publico, 
          name='colores-producto-publico'),
+    
+    # Debug endpoint
+    path('debug/environment/', 
+         debug_environment, 
+         name='debug-environment'),
     
     # Include routers
     path('', include(router.urls)),
