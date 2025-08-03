@@ -3,6 +3,11 @@ import os
 import psycopg2.extensions
 import dj_database_url
 
+# Cloudinary configuration
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', default='default-secret-key')
@@ -31,6 +36,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'nested_admin',
     'debug_toolbar',
+    'cloudinary_storage',
     
     # Local apps
     'productos.apps.ProductosConfig',
@@ -118,10 +124,36 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Configuración de archivos estáticos y media
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloudinary configuration para producción
+if 'RENDER' in os.environ:
+    # Configuración de Cloudinary para producción
+    CLOUDINARY = {
+        'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'api_key': os.environ.get('CLOUDINARY_API_KEY'),
+        'api_secret': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+    
+    # Configurar Cloudinary
+    cloudinary.config(
+        cloud_name=CLOUDINARY['cloud_name'],
+        api_key=CLOUDINARY['api_key'],
+        api_secret=CLOUDINARY['api_secret']
+    )
+    
+    # Usar Cloudinary para archivos media en producción
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    # Configuración local para desarrollo
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuración CORS para desarrollo y producción
