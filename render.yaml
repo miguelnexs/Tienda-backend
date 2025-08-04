@@ -14,7 +14,7 @@ services:
           name: tienda-db
           property: connectionString
       - key: DJANGO_SETTINGS_MODULE
-        value: Backend.settings
+        value: Backend.render_settings
       - key: WEB_CONCURRENCY
         value: 4
 
