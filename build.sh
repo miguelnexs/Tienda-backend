@@ -16,8 +16,8 @@ pip install -r requirements.txt
 echo "🔍 Verificando configuración..."
 python check_deployment.py
 
-# Initialize database for Render
-echo "🗄️  Inicializando base de datos..."
-python init_render.py
+# Final deployment for Render
+echo "🚀 Iniciando despliegue final..."
+python final_deploy.py
 
 echo "✅ Build completado exitosamente!" 
