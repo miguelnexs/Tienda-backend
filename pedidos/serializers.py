@@ -74,14 +74,10 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         # Validar que no exista ya un pedido para esta venta
         if Pedido.objects.filter(venta_id=venta_id).exists():
             raise serializers.ValidationError({'venta_id': 'Ya existe un pedido para esta venta.'})
-        # Asegurar que siempre haya un cliente
+        # Validar que siempre haya un cliente válido
         cliente = validated_data.get('cliente', None)
         if not cliente and 'cliente_id' not in validated_data:
-            from ventas.models import Cliente
-            cliente = Cliente.objects.first()  # type: ignore[attr-defined]
-            if not cliente:
-                raise serializers.ValidationError("No hay cliente asignado ni clientes en la base de datos.")
-            validated_data['cliente'] = cliente
+            raise serializers.ValidationError({'cliente_id': 'El campo cliente_id es obligatorio para crear un pedido.'})
         items_data = validated_data.pop('items', [])
         pedido = Pedido.objects.create(**validated_data)
         for item_data in items_data:

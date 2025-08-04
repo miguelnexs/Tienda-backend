@@ -330,35 +330,40 @@ class VentaViewSet(viewsets.ModelViewSet):
                 # ✅ Crear pedido automáticamente después de la venta
                 from pedidos.models import Pedido, ItemPedido
                 
-                # Determinar tipo de venta basado en el método de pago
-                tipo_venta = 'fisica' if venta.metodo_pago in ['efectivo', 'tarjeta'] else 'digital'
-                
-                # Crear el pedido
-                pedido = Pedido.objects.create(
-                    cliente=cliente,
-                    venta=venta,
-                    tipo_venta=tipo_venta,
-                    estado_pago='pagado' if venta.estado == 'completada' else 'pendiente',
-                    estado_pedido='pendiente',
-                    direccion_entrega=cliente.direccion if cliente else '',
-                    telefono_contacto=cliente.telefono if cliente else '',
-                    metodo_pago=venta.metodo_pago,
-                    notas=venta.observaciones
-                )
-                
-                # Crear items del pedido basados en los items de la venta
-                for item_venta in venta.items.all():
-                    precio_unitario = item_venta.producto.precio
-                    if item_venta.variante:
-                        precio_unitario += item_venta.variante.precio_extra
-                    ItemPedido.objects.create(
-                        pedido=pedido,
-                        producto=item_venta.producto,
-                        cantidad=item_venta.cantidad,
-                        precio_unitario=precio_unitario,
-                        subtotal=item_venta.subtotal,
-                        color=item_venta.color  # Guardar el color seleccionado
+                # Solo crear pedido si hay un cliente válido
+                if cliente:
+                    # Determinar tipo de venta basado en el método de pago
+                    tipo_venta = 'fisica' if venta.metodo_pago in ['efectivo', 'tarjeta'] else 'digital'
+                    
+                    # Crear el pedido
+                    pedido = Pedido.objects.create(
+                        cliente=cliente,
+                        venta=venta,
+                        tipo_venta=tipo_venta,
+                        estado_pago='pagado' if venta.estado == 'completada' else 'pendiente',
+                        estado_pedido='pendiente',
+                        direccion_entrega=cliente.direccion if cliente else '',
+                        telefono_contacto=cliente.telefono if cliente else '',
+                        metodo_pago=venta.metodo_pago,
+                        notas=venta.observaciones
                     )
+                    
+                    # Crear items del pedido basados en los items de la venta
+                    for item_venta in venta.items.all():
+                        precio_unitario = item_venta.producto.precio
+                        if item_venta.variante:
+                            precio_unitario += item_venta.variante.precio_extra
+                        ItemPedido.objects.create(
+                            pedido=pedido,
+                            producto=item_venta.producto,
+                            cantidad=item_venta.cantidad,
+                            precio_unitario=precio_unitario,
+                            subtotal=item_venta.subtotal,
+                            color=item_venta.color  # Guardar el color seleccionado
+                        )
+                else:
+                    # Si no hay cliente, no crear pedido (venta anónima)
+                    print(f"⚠️ Venta {venta.numero_venta} creada sin cliente - no se creará pedido")
 
                 # Serializar la venta completa
                 serializer = self.get_serializer(venta)
