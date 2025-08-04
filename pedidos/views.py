@@ -153,8 +153,13 @@ class PedidoViewSet(viewsets.ModelViewSet):
         ventas_fisicas = Pedido.objects.filter(tipo_venta='fisica').count()
         ventas_digitales = Pedido.objects.filter(tipo_venta='digital').count()
         
-        # Total de ingresos
-        total_ingresos = Pedido.objects.aggregate(
+        # Total de ingresos (solo pedidos confirmados)
+        total_ingresos = Pedido.objects.filter(estado_pedido='confirmado').aggregate(
+            total=Sum('venta__total')
+        )['total'] or 0
+        
+        # Total de ingresos de todos los pedidos (para comparación)
+        total_ingresos_todos = Pedido.objects.aggregate(
             total=Sum('venta__total')
         )['total'] or 0
         
@@ -171,7 +176,9 @@ class PedidoViewSet(viewsets.ModelViewSet):
             'ventas_fisicas': ventas_fisicas,
             'ventas_digitales': ventas_digitales,
             'total_ingresos': float(total_ingresos),
-            'pedidos_ultimo_mes': pedidos_ultimo_mes
+            'total_ingresos_todos': float(total_ingresos_todos),
+            'pedidos_ultimo_mes': pedidos_ultimo_mes,
+            'pedidos_confirmados': Pedido.objects.filter(estado_pedido='confirmado').count()
         })
 
 class ItemPedidoViewSet(viewsets.ModelViewSet):
