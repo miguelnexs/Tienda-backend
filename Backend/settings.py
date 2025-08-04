@@ -3,10 +3,7 @@ import os
 import psycopg2.extensions
 import dj_database_url
 
-# Cloudinary configuration
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,7 +33,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'nested_admin',
     # 'debug_toolbar',  # Comentado temporalmente para producción
-    'cloudinary_storage',
     
     # Local apps
     'productos.apps.ProductosConfig',
@@ -132,55 +128,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Cloudinary configuration para producción
-if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
-    # Configuración de Cloudinary para producción o desarrollo con variables configuradas
-    CLOUDINARY = {
-        'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        'api_key': os.environ.get('CLOUDINARY_API_KEY'),
-        'api_secret': os.environ.get('CLOUDINARY_API_SECRET'),
-    }
-    
-    # Configurar Cloudinary
-    cloudinary.config(
-        cloud_name=CLOUDINARY['cloud_name'],
-        api_key=CLOUDINARY['api_key'],
-        api_secret=CLOUDINARY['api_secret']
-    )
-    
-    # Usar Cloudinary para archivos media en producción
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configuración adicional para Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': CLOUDINARY['cloud_name'],
-        'API_KEY': CLOUDINARY['api_key'],
-        'API_SECRET': CLOUDINARY['api_secret'],
-        'STATIC_TAG': 'static',
-        'MEDIA_TAG': 'media',
-        'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
-        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'svg', 'svgz', 'ico'],
-        'MAGIC_FILE_PATH': 'magic',
-        'STATICFILES_MANIFEST_ROOT': BASE_DIR / 'staticfiles',
-        'STATICFILES_STORAGE': 'cloudinary_storage.storage.StaticHashedCloudinaryStorage',
-    }
-    
-    # Configurar MEDIA_URL para Cloudinary
-    MEDIA_URL = '/media/'
-    
-    # Configurar Cloudinary desde el archivo específico
-    from .cloudinary_config import configure_cloudinary
-    configure_cloudinary()
-    
-    print(f"✅ Cloudinary configurado para producción: {CLOUDINARY['cloud_name']}")
-else:
-    # Configuración local para desarrollo sin Cloudinary
-    print("🔧 Configuración local sin Cloudinary")
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-    
-    # Configurar storage local para desarrollo
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Configuración de archivos media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configurar storage local
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

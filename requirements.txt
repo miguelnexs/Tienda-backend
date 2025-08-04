@@ -25,7 +25,6 @@ django-nested-admin==4.1.1  # ✅ Versión corregida
 
 # Imágenes
 Pillow==11.3.0
-django-cloudinary-storage==0.3.0
 
 # Validaciones y utilidades
 python-decouple==3.8

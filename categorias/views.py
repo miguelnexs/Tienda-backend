@@ -109,13 +109,13 @@ class CategoriaViewSet(viewsets.ModelViewSet):
                     "imagen": "La imagen es demasiado grande. Máximo 10MB"
                 })
             
-            # Guardar imagen usando el storage de Cloudinary
+            # Guardar imagen usando el storage local
             from django.core.files.base import ContentFile
             
             # Crear un ContentFile directamente del archivo
             content_file = ContentFile(imagen.read(), name=imagen.name)
             
-            # Guardar usando el campo del modelo (que ya tiene MediaCloudinaryStorage)
+            # Guardar usando el campo del modelo
             categoria.imagen.save(imagen.name, content_file, save=True)
             logger.info(f"Imagen guardada exitosamente para categoría: {categoria.nombre}")
             

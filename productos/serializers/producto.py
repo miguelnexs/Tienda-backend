@@ -29,20 +29,15 @@ class ProductoSerializer(serializers.ModelSerializer):
 
     def get_imagen_principal_url(self, obj):
         """
-        Obtiene la URL de la imagen principal con manejo de Cloudinary
+        Obtiene la URL de la imagen principal
         """
         if obj.imagen_principal:
             try:
-                # Si estamos en producción (Render) o tenemos Cloudinary configurado
-                if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
-                    # Usar URL directa de Cloudinary
-                    return obj.imagen_principal.url
-                else:
-                    # En desarrollo, construir URL absoluta
-                    request = self.context.get('request')
-                    if request is not None:
-                        return request.build_absolute_uri(obj.imagen_principal.url)
-                    return obj.imagen_principal.url
+                # Construir URL absoluta
+                request = self.context.get('request')
+                if request is not None:
+                    return request.build_absolute_uri(obj.imagen_principal.url)
+                return obj.imagen_principal.url
             except Exception as e:
                 print(f"Error generando URL para imagen principal de producto {obj.slug}: {str(e)}")
                 return None

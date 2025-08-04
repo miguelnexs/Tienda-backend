@@ -19,20 +19,15 @@ class ImagenProductoSerializer(serializers.ModelSerializer):
 
     def get_url_imagen(self, obj):
         """
-        Obtiene la URL de la imagen con manejo de Cloudinary
+        Obtiene la URL de la imagen
         """
         if obj.imagen:
             try:
-                # Si estamos en producción (Render) o tenemos Cloudinary configurado
-                if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
-                    # Usar URL directa de Cloudinary
-                    return obj.imagen.url
-                else:
-                    # En desarrollo, construir URL absoluta
-                    request = self.context.get('request')
-                    if request is not None:
-                        return request.build_absolute_uri(obj.imagen.url)
-                    return obj.imagen.url
+                # Construir URL absoluta
+                request = self.context.get('request')
+                if request is not None:
+                    return request.build_absolute_uri(obj.imagen.url)
+                return obj.imagen.url
             except Exception as e:
                 print(f"Error generando URL para imagen {obj.id}: {str(e)}")
                 return None
@@ -202,13 +197,8 @@ class ColorProductoListSerializer(serializers.ModelSerializer):
             try:
                 request = self.context.get('request')
                 if request is not None:
-                    # Si estamos en producción (Render) o tenemos Cloudinary configurado
-                    if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
-                        # Usar URL directa de Cloudinary
-                        return imagen_principal.imagen.url
-                    else:
-                        # En desarrollo, construir URL absoluta
-                        return request.build_absolute_uri(imagen_principal.imagen.url)
+                    # Construir URL absoluta
+                    return request.build_absolute_uri(imagen_principal.imagen.url)
                 return imagen_principal.imagen.url
             except Exception as e:
                 print(f"Error generando URL para imagen de color {obj.nombre}: {str(e)}")
@@ -220,13 +210,8 @@ class ColorProductoListSerializer(serializers.ModelSerializer):
             try:
                 request = self.context.get('request')
                 if request is not None:
-                    # Si estamos en producción (Render) o tenemos Cloudinary configurado
-                    if 'RENDER' in os.environ or os.environ.get('CLOUDINARY_CLOUD_NAME'):
-                        # Usar URL directa de Cloudinary
-                        return primera_imagen.imagen.url
-                    else:
-                        # En desarrollo, construir URL absoluta
-                        return request.build_absolute_uri(primera_imagen.imagen.url)
+                    # Construir URL absoluta
+                    return request.build_absolute_uri(primera_imagen.imagen.url)
                 return primera_imagen.imagen.url
             except Exception as e:
                 print(f"Error generando URL para imagen de color {obj.nombre}: {str(e)}")
