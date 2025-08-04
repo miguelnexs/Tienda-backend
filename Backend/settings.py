@@ -2,6 +2,10 @@ from pathlib import Path
 import os
 import psycopg2.extensions
 import dj_database_url
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+load_dotenv()
 
 
 
