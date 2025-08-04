@@ -27,4 +27,4 @@ databases:
 buildCommand: |
   pip install --upgrade pip
   pip install -r requirements.txt
-  python final_deploy.py 
+  python simple_deploy.py 

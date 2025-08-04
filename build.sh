@@ -16,8 +16,8 @@ pip install -r requirements.txt
 echo "🔍 Verificando configuración..."
 python check_deployment.py
 
-# Final deployment for Render
-echo "🚀 Iniciando despliegue final..."
-python final_deploy.py
+# Simple deployment for Render
+echo "🚀 Iniciando despliegue simple..."
+python simple_deploy.py
 
 echo "✅ Build completado exitosamente!" 

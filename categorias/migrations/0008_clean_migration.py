@@ -4,12 +4,12 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    initial = True
-
     dependencies = [
+        ('categorias', '0007_merge_migrations'),
     ]
 
     operations = [
+        # Recrear el modelo completo con configuración correcta
         migrations.CreateModel(
             name='CategoriaProducto',
             fields=[
