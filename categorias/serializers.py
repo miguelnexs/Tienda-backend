@@ -17,7 +17,35 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
             'activa', 'orden', 'fecha_creacion', 'fecha_actualizacion',
             'cantidad_productos'
         ]
-        read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
+        read_only_fields = ['fecha_creacion', 'fecha_actualizacion', 'slug']
+
+    def validate_nombre(self, value):
+        """
+        Validar que el nombre sea único
+        """
+        if not value or value.strip() == '':
+            raise serializers.ValidationError("El nombre de la categoría es requerido")
+        
+        # Verificar si ya existe una categoría con el mismo nombre
+        instance = getattr(self, 'instance', None)
+        if CategoriaProducto.objects.filter(nombre__iexact=value.strip()).exclude(pk=instance.pk if instance else None).exists():
+            raise serializers.ValidationError("Ya existe una categoría con ese nombre")
+        
+        return value.strip()
+
+    def create(self, validated_data):
+        """
+        Crear categoría con slug automático
+        """
+        # El slug se generará automáticamente en el modelo
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Actualizar categoría con slug automático
+        """
+        # El slug se generará automáticamente en el modelo si el nombre cambió
+        return super().update(instance, validated_data)
 
     def get_imagen_url(self, obj):
         """

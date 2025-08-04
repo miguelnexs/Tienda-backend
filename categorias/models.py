@@ -18,6 +18,8 @@ class CategoriaProducto(models.Model):
     slug = models.SlugField(
         max_length=120,
         unique=True,
+        blank=True,
+        null=True,
         verbose_name=_("Slug para URL"),
         help_text=_("Identificador único para URLs")
     )
@@ -72,9 +74,16 @@ class CategoriaProducto(models.Model):
         return self.nombre
 
     def save(self, *args, **kwargs):
-        # Generar slug automáticamente si no existe
-        if not self.slug:
-            self.slug = slugify(self.nombre)
+        # Generar slug automáticamente si no existe o si el nombre cambió
+        if not self.slug or (self.pk and self.nombre != self._state.fields_cache.get('nombre', self.nombre)):
+            base_slug = slugify(self.nombre)
+            self.slug = base_slug
+            
+            # Si el slug ya existe, agregar un número
+            counter = 1
+            while CategoriaProducto.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
         super().save(*args, **kwargs)
 
     @property
