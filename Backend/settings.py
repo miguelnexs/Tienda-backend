@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'nested_admin',
+    'cloudinary_storage',  # Para almacenamiento de imágenes en la nube
     # 'debug_toolbar',  # Comentado temporalmente para producción
     
     # Local apps
@@ -286,3 +287,47 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 # URL del frontend para desarrollo local
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+
+# Configuración de Cloudinary para almacenamiento de imágenes
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+# Configuración de Cloudinary
+CLOUDINARY = {
+    'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME', 'your-cloud-name'),
+    'api_key': os.environ.get('CLOUDINARY_API_KEY', 'your-api-key'),
+    'api_secret': os.environ.get('CLOUDINARY_API_SECRET', 'your-api-secret'),
+}
+
+# Configurar Cloudinary
+cloudinary.config(
+    cloud_name=CLOUDINARY['cloud_name'],
+    api_key=CLOUDINARY['api_key'],
+    api_secret=CLOUDINARY['api_secret']
+)
+
+# Configuración de almacenamiento para producción (Render)
+if 'RENDER' in os.environ:
+    # En producción, usar Cloudinary para archivos media
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+    
+    # Configuración adicional para Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY['cloud_name'],
+        'API_KEY': CLOUDINARY['api_key'],
+        'API_SECRET': CLOUDINARY['api_secret'],
+        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
+                                    'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
+        'MAGIC_FILE_PATH': 'magic',
+        'STATIC_IMAGES_TRANSFORMATIONS': {
+            'default': {
+                'quality': 'auto',
+                'fetch_format': 'auto',
+            }
+        }
+    }
+else:
+    # En desarrollo, usar almacenamiento local
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
