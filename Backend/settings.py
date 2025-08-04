@@ -125,6 +125,7 @@ USE_TZ = True
 # Configuración de archivos estáticos y media
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Configuración de archivos media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

@@ -30,6 +30,9 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Configurar storage local para Render
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 # Configuración de seguridad para producción
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False

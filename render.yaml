@@ -27,4 +27,4 @@ databases:
 buildCommand: |
   pip install --upgrade pip
   pip install -r requirements.txt
-  python simple_deploy.py 
+  python fix_db_migrations.py 

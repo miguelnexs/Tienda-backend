@@ -16,8 +16,8 @@ pip install -r requirements.txt
 echo "🔍 Verificando configuración..."
 python check_deployment.py
 
-# Simple deployment for Render
-echo "🚀 Iniciando despliegue simple..."
-python simple_deploy.py
+# Fix database migrations for Render
+echo "🚀 Arreglando migraciones de base de datos..."
+python fix_db_migrations.py
 
 echo "✅ Build completado exitosamente!" 
