@@ -41,7 +41,10 @@ class Producto(models.Model):
     slug = models.SlugField(
         max_length=220,
         unique=True,
-        verbose_name=_("Slug para URL")
+        blank=True,
+        null=True,
+        verbose_name=_("Slug para URL"),
+        help_text=_("Identificador único para URLs")
     )
     
     # Imagen principal
@@ -269,7 +272,14 @@ class Producto(models.Model):
     def save(self, *args, **kwargs):
         # Generar slug automáticamente si no existe
         if not self.slug:
-            self.slug = slugify(self.nombre)
+            base_slug = slugify(self.nombre)
+            self.slug = base_slug
+            
+            # Si el slug ya existe, agregar un número
+            counter = 1
+            while Producto.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
         super().save(*args, **kwargs)
 
     def __str__(self):

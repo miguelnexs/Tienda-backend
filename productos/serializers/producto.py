@@ -25,7 +25,7 @@ class ProductoSerializer(serializers.ModelSerializer):
             'fecha_creacion', 'fecha_publicacion', 'fecha_actualizacion',
             'variantes', 'colores', 'imagen_principal_url'
         ]
-        read_only_fields = ['fecha_creacion', 'fecha_actualizacion', 'vendidos']
+        read_only_fields = ['fecha_creacion', 'fecha_actualizacion', 'vendidos', 'slug']
 
     def get_imagen_principal_url(self, obj):
         """
@@ -60,3 +60,28 @@ class ProductoSerializer(serializers.ModelSerializer):
             }
             for v in variantes
         ]
+
+    def validate(self, attrs):
+        """
+        Validación personalizada para el serializer
+        """
+        # Remover slug de la validación si está presente
+        attrs.pop('slug', None)
+        print(f"🔍 ProductoSerializer.validate - attrs después de remover slug: {attrs}")
+        return attrs
+
+    def create(self, validated_data):
+        """
+        Crear producto con slug automático
+        """
+        # Remover slug si está presente para que se genere automáticamente
+        validated_data.pop('slug', None)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Actualizar producto con slug automático
+        """
+        # Remover slug si está presente para que se genere automáticamente
+        validated_data.pop('slug', None)
+        return super().update(instance, validated_data)
