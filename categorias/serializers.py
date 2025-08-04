@@ -37,14 +37,16 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         """
         Crear categoría con slug automático
         """
-        # El slug se generará automáticamente en el modelo
+        # Remover slug si está presente para que se genere automáticamente
+        validated_data.pop('slug', None)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         """
         Actualizar categoría con slug automático
         """
-        # El slug se generará automáticamente en el modelo si el nombre cambió
+        # Remover slug si está presente para que se genere automáticamente
+        validated_data.pop('slug', None)
         return super().update(instance, validated_data)
 
     def get_imagen_url(self, obj):
