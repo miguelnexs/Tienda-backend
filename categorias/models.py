@@ -74,8 +74,8 @@ class CategoriaProducto(models.Model):
         return self.nombre
 
     def save(self, *args, **kwargs):
-        # Generar slug automáticamente si no existe o si el nombre cambió
-        if not self.slug or (self.pk and self.nombre != self._state.fields_cache.get('nombre', self.nombre)):
+        # Generar slug automáticamente si no existe
+        if not self.slug:
             base_slug = slugify(self.nombre)
             self.slug = base_slug
             

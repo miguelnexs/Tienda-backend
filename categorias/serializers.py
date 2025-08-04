@@ -33,6 +33,14 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         
         return value.strip()
 
+    def validate(self, attrs):
+        """
+        Validación personalizada para el serializer
+        """
+        # Remover slug de la validación si está presente
+        attrs.pop('slug', None)
+        return attrs
+
     def create(self, validated_data):
         """
         Crear categoría con slug automático
