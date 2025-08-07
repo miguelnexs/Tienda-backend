@@ -78,9 +78,13 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
 
     def _save_imagen(self, categoria, imagen):
         """
-        Guardar imagen usando el storage configurado (Cloudinary en producción)
+        Guardar imagen usando nuestro storage personalizado de Cloudinary
         """
         try:
+            # Importar nuestro storage personalizado
+            from Backend.cloudinary_storage import CloudinaryStorage
+            cloudinary_storage = CloudinaryStorage()
+            
             # Si es un InMemoryUploadedFile, convertirlo a ContentFile
             if isinstance(imagen, InMemoryUploadedFile):
                 # Leer el contenido del archivo
@@ -90,11 +94,28 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
                 # Crear ContentFile
                 content_file = ContentFile(content, name=imagen.name)
                 
-                # Guardar usando el campo del modelo (esto usará el storage configurado)
-                categoria.imagen.save(imagen.name, content_file, save=True)
+                # Generar nombre único para Cloudinary
+                import uuid
+                unique_name = f"categorias/{uuid.uuid4().hex}_{imagen.name}"
+                
+                # Guardar usando nuestro storage personalizado
+                saved_path = cloudinary_storage.save(unique_name, content_file)
+                
+                # IMPORTANTE: Actualizar el campo imagen con la URL de Cloudinary
+                categoria.imagen.name = saved_path
+                categoria.save()
+                
+                # Verificar que la URL se actualizó correctamente
+                categoria.refresh_from_db()
+                
             else:
                 # Para otros tipos de archivo, guardar directamente
-                categoria.imagen.save(imagen.name, imagen, save=True)
+                import uuid
+                unique_name = f"categorias/{uuid.uuid4().hex}_{imagen.name}"
+                saved_path = cloudinary_storage.save(unique_name, imagen)
+                categoria.imagen.name = saved_path
+                categoria.save()
+                categoria.refresh_from_db()
             
             print(f"✅ Imagen guardada exitosamente para categoría: {categoria.nombre}")
             print(f"📁 Ruta de la imagen: {categoria.imagen.name}")

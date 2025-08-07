@@ -45,31 +45,15 @@ cloudinary.config(
 
 # FORZAR configuración de Cloudinary para Render
 # En producción (Render), usar Cloudinary para archivos media
-# IMPORTANTE: Sobrescribir explícitamente la configuración de settings.py
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+# IMPORTANTE: Usar nuestro storage personalizado
+DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage.CloudinaryStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # DEBUG: Verificar configuración de Cloudinary
 print(f"☁️ CLOUDINARY CONFIGURADO:")
 print(f"  Cloud Name: {CLOUDINARY['cloud_name']}")
 print(f"  API Key: {CLOUDINARY['api_key'][:10]}...")
 print(f"  DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
-
-# Configuración adicional para Cloudinary
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': CLOUDINARY['cloud_name'],
-    'API_KEY': CLOUDINARY['api_key'],
-    'API_SECRET': CLOUDINARY['api_secret'],
-    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
-                                'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
-    'MAGIC_FILE_PATH': 'magic',
-    'STATIC_IMAGES_TRANSFORMATIONS': {
-        'default': {
-            'quality': 'auto',
-            'fetch_format': 'auto',
-        }
-    }
-}
 
 # Configuración de seguridad para producción
 SECURE_SSL_REDIRECT = False

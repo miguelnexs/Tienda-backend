@@ -35,7 +35,8 @@ class CategoriaProducto(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Imagen de la categoría"),
-        help_text=_("Imagen representativa de la categoría")
+        help_text=_("Imagen representativa de la categoría"),
+        storage=None  # Usar storage por defecto configurado en settings
     )
     
     activa = models.BooleanField(
