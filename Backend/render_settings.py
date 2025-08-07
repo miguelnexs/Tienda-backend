@@ -3,23 +3,14 @@ Configuración específica para Render
 """
 import os
 from .settings import *
+import dj_database_url
 
 # Configuración específica para Render
 DEBUG = False
 
 # Configuración de base de datos para Render
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME', 'tienda_production'),
-        'USER': os.environ.get('DATABASE_USER', 'tienda_user'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', ''),
-        'HOST': os.environ.get('DATABASE_HOST', ''),
-        'PORT': os.environ.get('DATABASE_PORT', '5432'),
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        },
-    }
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
 }
 
 # Configuración de archivos estáticos para Render
