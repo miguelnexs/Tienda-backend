@@ -2,11 +2,11 @@
 Configuración específica para Render
 """
 import os
-from .settings import *
 import dj_database_url
+import psycopg2.extensions
 
-# FORZAR configuración de Cloudinary - ULTRA AGRESIVO
-from .aggressive_cloudinary_settings import *
+# Importar configuración base desde settings.py
+from .settings import *
 
 # DEBUG: Verificar si este archivo se está cargando
 print("🚀 RENDER_SETTINGS.PY CARGADO - CONFIGURACIÓN DE PRODUCCIÓN ACTIVA")
@@ -33,11 +33,6 @@ CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'do1ntnlop')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '117225377115856')
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', 'e0YSrk3sT_70-ijM6mwdFBIWP9w')
 
-# Configurar Cloudinary para almacenamiento en producción
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
 # Configurar Cloudinary
 cloudinary.config(
     cloud_name=CLOUDINARY_CLOUD_NAME,
@@ -45,9 +40,8 @@ cloudinary.config(
     api_secret=CLOUDINARY_API_SECRET
 )
 
-# FORZAR configuración de Cloudinary para Render - ULTRA AGRESIVO
+# FORZAR configuración de Cloudinary para Render
 # En producción (Render), usar Cloudinary para archivos media
-# IMPORTANTE: Usar nuestro storage ultra-agresivo
 DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage_fixed_urls.CloudinaryStorageFixedURLs'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
