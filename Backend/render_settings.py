@@ -49,6 +49,7 @@ cloudinary.config(
     api_secret=CLOUDINARY['api_secret']
 )
 
+# FORZAR configuración de Cloudinary para Render
 # En producción (Render), usar Cloudinary para archivos media
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
