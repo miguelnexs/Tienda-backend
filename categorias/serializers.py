@@ -4,14 +4,10 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from .models import CategoriaProducto
 
-
 class CategoriaProductoSerializer(serializers.ModelSerializer):
-    """
-    Serializer para categorías de productos con manejo mejorado de imágenes
-    """
     imagen_url = serializers.SerializerMethodField()
     cantidad_productos = serializers.ReadOnlyField()
-    
+
     class Meta:
         model = CategoriaProducto
         fields = [
@@ -23,15 +19,14 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
 
     def validate_nombre(self, value):
         """
-        Validar que el nombre sea único
+        Validar que el nombre no esté vacío y no sea duplicado
         """
-        if not value or value.strip() == '':
-            raise serializers.ValidationError("El nombre de la categoría es requerido")
+        if not value or not value.strip():
+            raise serializers.ValidationError("El nombre no puede estar vacío")
         
         # Verificar si ya existe una categoría con el mismo nombre
-        instance = getattr(self, 'instance', None)
-        if CategoriaProducto.objects.filter(nombre__iexact=value.strip()).exclude(pk=instance.pk if instance else None).exists():
-            raise serializers.ValidationError("Ya existe una categoría con ese nombre")
+        if CategoriaProducto.objects.filter(nombre__iexact=value.strip()).exists():
+            raise serializers.ValidationError("Ya existe una categoría con este nombre")
         
         return value.strip()
 
@@ -41,74 +36,44 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         """
         if value is None:
             return value
-            
-        # Validar tipo de archivo
+
         allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
         if hasattr(value, 'content_type') and value.content_type not in allowed_types:
             raise serializers.ValidationError(
                 "Tipo de archivo no permitido. Use JPEG, PNG, WEBP, GIF o SVG"
             )
-        
-        # Validar extensión
+
         valid_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']
         ext = os.path.splitext(value.name)[1].lower()
         if ext not in valid_extensions:
             raise serializers.ValidationError(
                 "Formato de imagen no soportado. Use JPG, PNG, WEBP, GIF o SVG"
             )
-        
-        # Validar tamaño (máximo 10MB)
+
         if value.size > 10 * 1024 * 1024:
             raise serializers.ValidationError(
                 "La imagen es demasiado grande. Máximo 10MB"
             )
-        
         return value
 
     def validate(self, attrs):
-        """
-        Validación personalizada para el serializer
-        """
-        # Remover slug de la validación si está presente
         attrs.pop('slug', None)
         return attrs
 
     def create(self, validated_data):
-        """
-        Crear categoría con manejo mejorado de imágenes
-        """
-        # Remover slug si está presente para que se genere automáticamente
         validated_data.pop('slug', None)
-        
-        # Procesar imagen si está presente
         imagen = validated_data.pop('imagen', None)
-        
-        # Crear la categoría
         categoria = super().create(validated_data)
-        
-        # Guardar imagen si se proporcionó
         if imagen:
             self._save_imagen(categoria, imagen)
-        
         return categoria
 
     def update(self, instance, validated_data):
-        """
-        Actualizar categoría con manejo mejorado de imágenes
-        """
-        # Remover slug si está presente para que se genere automáticamente
         validated_data.pop('slug', None)
-        
-        # Procesar imagen si está presente
         imagen = validated_data.pop('imagen', None)
-        
-        # Actualizar la categoría
         categoria = super().update(instance, validated_data)
-        
-        # Guardar imagen si se proporcionó
         if imagen:
             self._save_imagen(categoria, imagen)
-        
         return categoria
 
     def _save_imagen(self, categoria, imagen):
@@ -135,6 +100,12 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
             print(f"📁 Ruta de la imagen: {categoria.imagen.name}")
             print(f"🔗 URL de la imagen: {categoria.imagen.url}")
             
+            # Verificar si se guardó en Cloudinary
+            if 'cloudinary.com' in categoria.imagen.url:
+                print("☁️ ¡La imagen se subió a Cloudinary!")
+            else:
+                print("📁 La imagen se guardó localmente")
+            
         except Exception as e:
             print(f"❌ Error al guardar imagen: {str(e)}")
             raise serializers.ValidationError({
@@ -142,12 +113,13 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
             })
 
     def get_imagen_url(self, obj):
-        """
-        Obtiene la URL de la imagen con manejo mejorado
-        """
         if obj.imagen:
             try:
-                # Construir URL absoluta
+                # Si la imagen está en Cloudinary, usar la URL completa
+                if hasattr(obj.imagen, 'url') and 'cloudinary.com' in obj.imagen.url:
+                    return obj.imagen.url
+                
+                # Si no, construir la URL completa
                 request = self.context.get('request')
                 if request is not None:
                     return request.build_absolute_uri(obj.imagen.url)
@@ -158,23 +130,22 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         return None
 
     def to_representation(self, instance):
-        """
-        Personalizar la representación del serializer
-        """
         data = super().to_representation(instance)
-        
-        # Asegurar que la URL de la imagen esté disponible
         if instance.imagen:
             try:
-                request = self.context.get('request')
-                if request is not None:
-                    data['imagen_url'] = request.build_absolute_uri(instance.imagen.url)
-                else:
+                # Verificar si la imagen está en Cloudinary
+                if hasattr(instance.imagen, 'url') and 'cloudinary.com' in instance.imagen.url:
                     data['imagen_url'] = instance.imagen.url
+                else:
+                    # Construir URL completa para imágenes locales
+                    request = self.context.get('request')
+                    if request is not None:
+                        data['imagen_url'] = request.build_absolute_uri(instance.imagen.url)
+                    else:
+                        data['imagen_url'] = instance.imagen.url
             except Exception as e:
                 print(f"Error generando URL para imagen: {str(e)}")
                 data['imagen_url'] = None
         else:
             data['imagen_url'] = None
-        
         return data

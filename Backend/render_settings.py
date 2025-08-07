@@ -75,11 +75,14 @@ SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-# Configuración de CORS para Render
+# Configuración de CORS para Render - CORREGIDA
 CORS_ALLOWED_ORIGINS = [
     "https://sobrio-estilo-tienda-main.vercel.app",
     "http://localhost:3000",
+    "http://localhost:5173",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "https://tienda-backend-qsre.onrender.com",
 ]
 
 # Configuración de logging para Render
