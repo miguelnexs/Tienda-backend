@@ -136,8 +136,26 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Configurar storage local
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Importar configuración forzada de Cloudinary
+from .force_cloudinary_settings import *
+
+# Importar configuración que fuerza el storage correcto
+from .force_storage_settings import *
+
+# Configuración de Cloudinary con credenciales hardcodeadas
+CLOUDINARY_CLOUD_NAME = "do1ntnlop"
+CLOUDINARY_API_KEY = "117225377115856"
+CLOUDINARY_API_SECRET = "e0YSrk3sT_70-ijM6mwdFBIWP9w"
+
+# Configurar storage para Cloudinary - FORZADO CON URLs CORREGIDAS
+DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage_fixed_urls.CloudinaryStorageFixedURLs'
+
+# Forzar el uso de Cloudinary para todos los campos de archivo
+MEDIA_URL = 'https://res.cloudinary.com/do1ntnlop/image/upload/'
+
+# Configuración adicional para forzar Cloudinary
+import os
+os.environ['DJANGO_CLOUDINARY_STORAGE'] = 'true'
 
 # Configuración específica para campos de fecha
 USE_TZ = True
@@ -313,27 +331,6 @@ cloudinary.config(
     api_secret=CLOUDINARY['api_secret']
 )
 
-# Configuración de almacenamiento para producción (Render)
-if 'RENDER' in os.environ:
-    # En producción, usar nuestro storage personalizado corregido
-    DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage_fixed.CloudinaryStorage'
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-    
-    # Configuración adicional para Cloudinary (mantenida para compatibilidad)
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': CLOUDINARY['cloud_name'],
-        'API_KEY': CLOUDINARY['api_key'],
-        'API_SECRET': CLOUDINARY['api_secret'],
-        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
-                                    'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
-        'MAGIC_FILE_PATH': 'magic',
-        'STATIC_IMAGES_TRANSFORMATIONS': {
-            'default': {
-                'quality': 'auto',
-                'fetch_format': 'auto',
-            }
-        }
-    }
-else:
-    # En desarrollo, usar almacenamiento local
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Configuración de almacenamiento para Cloudinary (desarrollo y producción)
+# El CloudinaryStorage se usa tanto en desarrollo como en producción
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

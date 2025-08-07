@@ -1,24 +1,19 @@
 """
-Configuración forzada de Cloudinary para producción
+Configuración forzada para Cloudinary
+Este archivo se importa en settings.py para forzar el uso de Cloudinary
 """
-import os
-
-# Configuración forzada de Cloudinary
-CLOUDINARY = {
-    'cloud_name': 'do1ntnlop',
-    'api_key': '117225377115856',
-    'api_secret': 'e0YSrk3sT_70-ijM6mwdFBIWP9w',
-}
-
-# Configurar Cloudinary inmediatamente
 import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+# Configurar Cloudinary con credenciales hardcodeadas
 cloudinary.config(
-    cloud_name=CLOUDINARY['cloud_name'],
-    api_key=CLOUDINARY['api_key'],
-    api_secret=CLOUDINARY['api_secret']
+    cloud_name="do1ntnlop",
+    api_key="117225377115856",
+    api_secret="e0YSrk3sT_70-ijM6mwdFBIWP9w"
 )
 
-print("🚀 FORZANDO CONFIGURACIÓN DE CLOUDINARY")
-print(f"  Cloud Name: {CLOUDINARY['cloud_name']}")
-print(f"  API Key: {CLOUDINARY['api_key'][:10]}...")
-print("✅ Cloudinary configurado forzadamente") 
+print("🔧 Cloudinary configurado en force_cloudinary_settings.py")
+print(f"  Cloud Name: do1ntnlop")
+print(f"  API Key: 117225377115856")
+print(f"  API Secret: e0YSrk3sT_70-ijM6mwdFBIWP9w") 

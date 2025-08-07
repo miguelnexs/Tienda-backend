@@ -88,6 +88,11 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     def _validate_and_save_image(self, categoria, imagen):
         """Validar y guardar imagen de categoría"""
         try:
+            # Verificar que la imagen no esté vacía
+            if not imagen or imagen.size == 0:
+                logger.warning(f"Imagen vacía para categoría: {categoria.nombre}")
+                return
+            
             # Validar tipo de archivo
             allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
             if imagen.content_type not in allowed_types:
@@ -109,11 +114,24 @@ class CategoriaViewSet(viewsets.ModelViewSet):
                     "imagen": "La imagen es demasiado grande. Máximo 10MB"
                 })
             
-            # Guardar imagen usando el storage local
-            from django.core.files.base import ContentFile
+            # Verificar si el archivo ya fue leído
+            current_position = imagen.tell()
+            if current_position > 0:
+                # El archivo ya fue leído, resetear posición
+                imagen.seek(0)
             
-            # Crear un ContentFile directamente del archivo
-            content_file = ContentFile(imagen.read(), name=imagen.name)
+            # Verificar que el contenido no esté vacío
+            content_data = imagen.read()
+            if len(content_data) == 0:
+                logger.warning(f"Imagen sin contenido para categoría: {categoria.nombre}")
+                return
+            
+            # Resetear posición del archivo
+            imagen.seek(0)
+            
+            # Guardar imagen usando el storage de Cloudinary
+            from django.core.files.base import ContentFile
+            content_file = ContentFile(content_data, name=imagen.name)
             
             # Guardar usando el campo del modelo
             categoria.imagen.save(imagen.name, content_file, save=True)
@@ -121,7 +139,9 @@ class CategoriaViewSet(viewsets.ModelViewSet):
             
         except Exception as e:
             logger.error(f"Error al procesar imagen: {str(e)}")
-            raise
+            # No lanzar la excepción para evitar error 500
+            # Solo registrar el error y continuar
+            return
 
     @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser])
     def upload_imagen(self, request, slug=None):

@@ -1,6 +1,6 @@
 """
-Storage personalizado para Cloudinary - Versión corregida
-Configurado para funcionar correctamente con Django models
+Storage personalizado para Cloudinary - Solución Completa
+Configurado para funcionar correctamente con credenciales hardcodeadas
 """
 import os
 from django.core.files.storage import Storage
@@ -9,14 +9,14 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-class CloudinaryStorageFixed(Storage):
+class CloudinaryStorageComplete(Storage):
     """
     Storage personalizado para Cloudinary
-    Versión corregida para funcionar con Django models
+    Solución completa con credenciales hardcodeadas
     """
     
     def __init__(self):
-        # Configuración para Cloudinary real
+        # Configuración hardcodeada para Cloudinary
         self._cloud_name = "do1ntnlop"
         self._api_key = "117225377115856"
         self._api_secret = "e0YSrk3sT_70-ijM6mwdFBIWP9w"
@@ -28,7 +28,7 @@ class CloudinaryStorageFixed(Storage):
             api_secret=self._api_secret
         )
         
-        print(f"🔧 CloudinaryStorageFixed inicializado:")
+        print(f"🔧 CloudinaryStorageComplete inicializado:")
         print(f"  Cloud Name: {self._cloud_name}")
         print(f"  API Key: {self._api_key[:10]}...")
         print(f"  API Secret: {self._api_secret[:10]}...")
@@ -111,9 +111,30 @@ class CloudinaryStorageFixed(Storage):
         """Obtener URL del archivo en Cloudinary"""
         try:
             # El name aquí es el public_id devuelto por _save
-            # Generar URL de Cloudinary directamente
+            # Obtener la URL real desde Cloudinary para incluir el version ID
+            try:
+                import cloudinary.api
+                result = cloudinary.api.resource(name)
+                url = result.get('secure_url', result.get('url'))
+                if url:
+                    print(f"🔗 URL generada desde Cloudinary: {url}")
+                    return url
+            except Exception as e:
+                print(f"⚠️ No se pudo obtener URL desde Cloudinary: {e}")
+                # Si no se puede obtener la URL desde Cloudinary, intentar con el nombre exacto
+                try:
+                    # Intentar con el nombre exacto que se guardó
+                    result = cloudinary.api.resource(name + '.jpg' if not name.endswith(('.jpg', '.png', '.gif')) else name)
+                    url = result.get('secure_url', result.get('url'))
+                    if url:
+                        print(f"🔗 URL generada con extensión: {url}")
+                        return url
+                except Exception as e2:
+                    print(f"⚠️ No se pudo obtener URL con extensión: {e2}")
+            
+            # Fallback: generar URL básica
             url = f"https://res.cloudinary.com/{self._cloud_name}/image/upload/{name}"
-            print(f"🔗 URL generada: {url}")
+            print(f"🔗 URL generada (fallback): {url}")
             return url
         except Exception as e:
             print(f"❌ Error generando URL: {e}")
@@ -161,4 +182,28 @@ class CloudinaryStorageFixed(Storage):
     
     def get_modified_time(self, name):
         """Obtener tiempo de modificación"""
-        return self.get_created_time(name) 
+        return self.get_created_time(name)
+    
+    def get_available_name(self, name, max_length=None):
+        """Obtener nombre disponible para el archivo"""
+        return name
+    
+    def get_valid_name(self, name):
+        """Obtener nombre válido para el archivo"""
+        return name
+    
+    def path(self, name):
+        """Obtener ruta del archivo (no aplicable para Cloudinary)"""
+        return name
+    
+    def listdir(self, path):
+        """Listar directorio (no aplicable para Cloudinary)"""
+        return [], []
+    
+    def mkdir(self, name):
+        """Crear directorio (no aplicable para Cloudinary)"""
+        pass
+    
+    def rmdir(self, name):
+        """Eliminar directorio (no aplicable para Cloudinary)"""
+        pass 

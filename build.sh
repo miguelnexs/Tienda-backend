@@ -24,4 +24,8 @@ python fix_db_migrations.py
 echo "☁️ Probando configuración de Cloudinary..."
 python check_cloudinary_production.py
 
+# Verify production configuration
+echo "🔍 Verificando configuración de producción..."
+python check_production.py
+
 echo "✅ Build completado exitosamente!" 

@@ -28,11 +28,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Configuración de Cloudinary para Render (producción)
-CLOUDINARY = {
-    'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME', 'do1ntnlop'),
-    'api_key': os.environ.get('CLOUDINARY_API_KEY', '1172253771'),
-    'api_secret': os.environ.get('CLOUDINARY_API_SECRET', 'e0YSrk3sT_'),
-}
+# Usar variables de entorno o credenciales hardcodeadas para producción
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'do1ntnlop')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '117225377115856')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', 'e0YSrk3sT_70-ijM6mwdFBIWP9w')
 
 # Configurar Cloudinary para almacenamiento en producción
 import cloudinary
@@ -41,21 +40,21 @@ import cloudinary.api
 
 # Configurar Cloudinary
 cloudinary.config(
-    cloud_name=CLOUDINARY['cloud_name'],
-    api_key=CLOUDINARY['api_key'],
-    api_secret=CLOUDINARY['api_secret']
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET
 )
 
 # FORZAR configuración de Cloudinary para Render - ULTRA AGRESIVO
 # En producción (Render), usar Cloudinary para archivos media
 # IMPORTANTE: Usar nuestro storage ultra-agresivo
-DEFAULT_FILE_STORAGE = 'Backend.ultra_cloudinary_storage.UltraCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage_fixed_urls.CloudinaryStorageFixedURLs'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # DEBUG: Verificar configuración de Cloudinary
-print(f"☁️ CLOUDINARY CONFIGURADO:")
-print(f"  Cloud Name: {CLOUDINARY['cloud_name']}")
-print(f"  API Key: {CLOUDINARY['api_key'][:10]}...")
+print(f"☁️ CLOUDINARY CONFIGURADO PARA PRODUCCIÓN:")
+print(f"  Cloud Name: {CLOUDINARY_CLOUD_NAME}")
+print(f"  API Key: {CLOUDINARY_API_KEY[:10]}...")
 print(f"  DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
 
 # Configuración de seguridad para producción
@@ -71,6 +70,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
     "https://tienda-backend-qsre.onrender.com",
+    "https://tienda-backend-api.onrender.com",
 ]
 
 # Configuración de logging para Render
@@ -98,24 +98,26 @@ LOGGING = {
 # Configuración de archivos de imagen
 FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
 
-# Configuración de timezone
-USE_TZ = True
-TIME_ZONE = 'UTC'
+# Configuración adicional para producción
+ALLOWED_HOSTS = [
+    'tienda-backend-qsre.onrender.com',
+    'tienda-backend-api.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
-# Configuración de sesiones
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 86400  # 24 horas
+# Configuración de archivos estáticos
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-# Configuración de caché (usar memoria en Render)
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
-}
+# Configuración de media para Cloudinary
+MEDIA_URL = 'https://res.cloudinary.com/do1ntnlop/image/upload/'
 
-# DEBUG: Confirmar que la configuración se aplicó
-print("✅ CONFIGURACIÓN DE RENDER APLICADA CORRECTAMENTE")
-print(f"  DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
-print(f"  STATICFILES_STORAGE: {STATICFILES_STORAGE}") 
+# Forzar el uso de Cloudinary para todos los campos de archivo
+import os
+os.environ['DJANGO_CLOUDINARY_STORAGE'] = 'true'
+
+print("✅ CONFIGURACIÓN DE PRODUCCIÓN COMPLETADA")
+print("🚀 SISTEMA LISTO PARA RENDER") 

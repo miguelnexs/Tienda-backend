@@ -1,6 +1,6 @@
 """
-Storage personalizado para Cloudinary - Versión corregida
-Configurado para funcionar correctamente con Django models
+Storage personalizado para Cloudinary - Versión Final
+Configurado para funcionar correctamente con Django admin
 """
 import os
 from django.core.files.storage import Storage
@@ -9,10 +9,10 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-class CloudinaryStorageFixed(Storage):
+class CloudinaryStorageFinal(Storage):
     """
     Storage personalizado para Cloudinary
-    Versión corregida para funcionar con Django models
+    Versión final que funciona correctamente con Django admin
     """
     
     def __init__(self):
@@ -28,7 +28,7 @@ class CloudinaryStorageFixed(Storage):
             api_secret=self._api_secret
         )
         
-        print(f"🔧 CloudinaryStorageFixed inicializado:")
+        print(f"🔧 CloudinaryStorageFinal inicializado:")
         print(f"  Cloud Name: {self._cloud_name}")
         print(f"  API Key: {self._api_key[:10]}...")
         print(f"  API Secret: {self._api_secret[:10]}...")
@@ -161,4 +161,12 @@ class CloudinaryStorageFixed(Storage):
     
     def get_modified_time(self, name):
         """Obtener tiempo de modificación"""
-        return self.get_created_time(name) 
+        return self.get_created_time(name)
+    
+    def get_available_name(self, name, max_length=None):
+        """Obtener nombre disponible para el archivo"""
+        return name
+    
+    def get_valid_name(self, name):
+        """Obtener nombre válido para el archivo"""
+        return name 

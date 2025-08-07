@@ -1,6 +1,6 @@
 """
-Storage personalizado para Cloudinary - Versión corregida
-Configurado para funcionar correctamente con Django models
+Storage personalizado para Cloudinary - Integración con Modelos
+Configurado para funcionar directamente con los modelos de Django
 """
 import os
 from django.core.files.storage import Storage
@@ -9,10 +9,10 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-class CloudinaryStorageFixed(Storage):
+class CloudinaryStorageModels(Storage):
     """
     Storage personalizado para Cloudinary
-    Versión corregida para funcionar con Django models
+    Integración directa con modelos de Django
     """
     
     def __init__(self):
@@ -28,7 +28,7 @@ class CloudinaryStorageFixed(Storage):
             api_secret=self._api_secret
         )
         
-        print(f"🔧 CloudinaryStorageFixed inicializado:")
+        print(f"🔧 CloudinaryStorageModels inicializado:")
         print(f"  Cloud Name: {self._cloud_name}")
         print(f"  API Key: {self._api_key[:10]}...")
         print(f"  API Secret: {self._api_secret[:10]}...")
@@ -111,9 +111,20 @@ class CloudinaryStorageFixed(Storage):
         """Obtener URL del archivo en Cloudinary"""
         try:
             # El name aquí es el public_id devuelto por _save
-            # Generar URL de Cloudinary directamente
+            # Obtener la URL real desde Cloudinary para incluir el version ID
+            try:
+                import cloudinary.api
+                result = cloudinary.api.resource(name)
+                url = result.get('secure_url', result.get('url'))
+                if url:
+                    print(f"🔗 URL generada desde Cloudinary: {url}")
+                    return url
+            except Exception as e:
+                print(f"⚠️ No se pudo obtener URL desde Cloudinary: {e}")
+            
+            # Fallback: generar URL básica
             url = f"https://res.cloudinary.com/{self._cloud_name}/image/upload/{name}"
-            print(f"🔗 URL generada: {url}")
+            print(f"🔗 URL generada (fallback): {url}")
             return url
         except Exception as e:
             print(f"❌ Error generando URL: {e}")
@@ -161,4 +172,28 @@ class CloudinaryStorageFixed(Storage):
     
     def get_modified_time(self, name):
         """Obtener tiempo de modificación"""
-        return self.get_created_time(name) 
+        return self.get_created_time(name)
+    
+    def get_available_name(self, name, max_length=None):
+        """Obtener nombre disponible para el archivo"""
+        return name
+    
+    def get_valid_name(self, name):
+        """Obtener nombre válido para el archivo"""
+        return name
+    
+    def path(self, name):
+        """Obtener ruta del archivo (no aplicable para Cloudinary)"""
+        return name
+    
+    def listdir(self, path):
+        """Listar directorio (no aplicable para Cloudinary)"""
+        return [], []
+    
+    def mkdir(self, name):
+        """Crear directorio (no aplicable para Cloudinary)"""
+        pass
+    
+    def rmdir(self, name):
+        """Eliminar directorio (no aplicable para Cloudinary)"""
+        pass 

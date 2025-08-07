@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 import os
 
+# Importar el storage de Cloudinary
+from Backend.cloudinary_storage_fixed_urls import CloudinaryStorageFixedURLs
 
 class CategoriaProducto(models.Model):
     """
@@ -35,7 +37,8 @@ class CategoriaProducto(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Imagen de la categoría"),
-        help_text=_("Imagen representativa de la categoría")
+        help_text=_("Imagen representativa de la categoría"),
+        storage=CloudinaryStorageFixedURLs()  # Forzar el uso del storage de Cloudinary
     )
     
     activa = models.BooleanField(

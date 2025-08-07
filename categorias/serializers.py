@@ -119,6 +119,16 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         Procesar y guardar imagen de manera simplificada
         """
         try:
+            # Verificar que la imagen no esté vacía
+            if not imagen or imagen.size == 0:
+                print(f"⚠️ Imagen vacía para categoría: {categoria.nombre}")
+                return
+            
+            # Verificar si la imagen ya fue procesada (ya tiene URL)
+            if categoria.imagen and categoria.imagen.url:
+                print(f"✅ Imagen ya procesada para categoría: {categoria.nombre}")
+                return
+            
             # Generar nombre único para la imagen
             import uuid
             import os
@@ -133,7 +143,7 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
             print(f"📤 Procesando imagen para categoría: {categoria.nombre}")
             print(f"📁 Nombre único: {unique_name}")
             
-            # Guardar la imagen usando el campo del modelo
+            # Guardar la imagen directamente sin leerla primero
             categoria.imagen.save(unique_name, imagen, save=True)
             
             print(f"✅ Imagen guardada exitosamente para categoría: {categoria.nombre}")
@@ -151,7 +161,12 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         except Exception as e:
             print(f"❌ Error al procesar imagen: {str(e)}")
             # No lanzar excepción para no interrumpir la creación de la categoría
-            # Solo registrar el error
+            # Solo registrar el error y continuar
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error al procesar imagen para categoría {categoria.nombre}: {str(e)}")
+            # No lanzar la excepción para evitar error 500
+            return
 
     def get_imagen_url(self, obj):
         """

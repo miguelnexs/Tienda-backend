@@ -17,6 +17,14 @@ services:
         value: Backend.render_settings
       - key: WEB_CONCURRENCY
         value: 4
+      - key: CLOUDINARY_CLOUD_NAME
+        value: do1ntnlop
+      - key: CLOUDINARY_API_KEY
+        value: 117225377115856
+      - key: CLOUDINARY_API_SECRET
+        value: e0YSrk3sT_70-ijM6mwdFBIWP9w
+      - key: DJANGO_CLOUDINARY_STORAGE
+        value: true
 
 databases:
   - name: tienda-db
