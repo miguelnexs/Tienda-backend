@@ -45,8 +45,8 @@ cloudinary.config(
 
 # FORZAR configuración de Cloudinary para Render
 # En producción (Render), usar Cloudinary para archivos media
-# IMPORTANTE: Usar nuestro storage personalizado
-DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage.CloudinaryStorage'
+# IMPORTANTE: Usar nuestro storage personalizado corregido
+DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage_fixed.CloudinaryStorage'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # DEBUG: Verificar configuración de Cloudinary

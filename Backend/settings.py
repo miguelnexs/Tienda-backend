@@ -315,8 +315,8 @@ cloudinary.config(
 
 # Configuración de almacenamiento para producción (Render)
 if 'RENDER' in os.environ:
-    # En producción, usar nuestro storage personalizado
-    DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage.CloudinaryStorage'
+    # En producción, usar nuestro storage personalizado corregido
+    DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage_fixed.CloudinaryStorage'
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     
     # Configuración adicional para Cloudinary (mantenida para compatibilidad)
