@@ -45,6 +45,7 @@ cloudinary.config(
 
 # FORZAR configuración de Cloudinary para Render
 # En producción (Render), usar Cloudinary para archivos media
+# IMPORTANTE: Sobrescribir explícitamente la configuración de settings.py
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 
@@ -128,4 +129,6 @@ CACHES = {
 }
 
 # DEBUG: Confirmar que la configuración se aplicó
-print("✅ CONFIGURACIÓN DE RENDER APLICADA CORRECTAMENTE") 
+print("✅ CONFIGURACIÓN DE RENDER APLICADA CORRECTAMENTE")
+print(f"  DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
+print(f"  STATICFILES_STORAGE: {STATICFILES_STORAGE}") 
