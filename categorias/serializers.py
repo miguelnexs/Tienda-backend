@@ -155,15 +155,21 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         """
         if obj.imagen:
             try:
-                # Si la imagen está en Cloudinary, usar la URL completa
-                if hasattr(obj.imagen, 'url') and 'cloudinary.com' in obj.imagen.url:
-                    return obj.imagen.url
+                # Obtener la URL de la imagen
+                if hasattr(obj.imagen, 'url'):
+                    url = obj.imagen.url
+                    
+                    # Si es una URL de Cloudinary, devolverla tal como está
+                    if 'cloudinary.com' in url:
+                        return url
+                    
+                    # Si es una URL local, construir la URL completa
+                    request = self.context.get('request')
+                    if request is not None:
+                        return request.build_absolute_uri(url)
+                    return url
                 
-                # Si no, construir la URL completa
-                request = self.context.get('request')
-                if request is not None:
-                    return request.build_absolute_uri(obj.imagen.url)
-                return obj.imagen.url
+                return None
             except Exception as e:
                 print(f"Error generando URL para imagen de categoría {obj.nombre}: {str(e)}")
                 return None
@@ -178,20 +184,28 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         # Asegurar que imagen_url esté presente
         if instance.imagen:
             try:
-                # Verificar si la imagen está en Cloudinary
-                if hasattr(instance.imagen, 'url') and 'cloudinary.com' in instance.imagen.url:
-                    data['imagen_url'] = instance.imagen.url
+                url = instance.imagen.url
+                
+                # Si es una URL de Cloudinary, usarla directamente
+                if 'cloudinary.com' in url:
+                    data['imagen_url'] = url
+                    data['imagen'] = url  # También actualizar el campo imagen
                 else:
-                    # Construir URL completa para imágenes locales
+                    # Para URLs locales, construir la URL completa
                     request = self.context.get('request')
                     if request is not None:
-                        data['imagen_url'] = request.build_absolute_uri(instance.imagen.url)
+                        full_url = request.build_absolute_uri(url)
+                        data['imagen_url'] = full_url
+                        data['imagen'] = full_url
                     else:
-                        data['imagen_url'] = instance.imagen.url
+                        data['imagen_url'] = url
+                        data['imagen'] = url
             except Exception as e:
                 print(f"Error generando URL para imagen: {str(e)}")
                 data['imagen_url'] = None
+                data['imagen'] = None
         else:
             data['imagen_url'] = None
+            data['imagen'] = None
         
         return data
