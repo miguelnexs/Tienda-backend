@@ -5,6 +5,9 @@ import os
 from .settings import *
 import dj_database_url
 
+# FORZAR configuración de Cloudinary
+from .force_cloudinary_settings import *
+
 # DEBUG: Verificar si este archivo se está cargando
 print("🚀 RENDER_SETTINGS.PY CARGADO - CONFIGURACIÓN DE PRODUCCIÓN ACTIVA")
 
@@ -45,8 +48,8 @@ cloudinary.config(
 
 # FORZAR configuración de Cloudinary para Render
 # En producción (Render), usar Cloudinary para archivos media
-# IMPORTANTE: Usar nuestro storage simple y directo
-DEFAULT_FILE_STORAGE = 'Backend.simple_cloudinary_storage.SimpleCloudinaryStorage'
+# IMPORTANTE: Usar nuestro storage directo con credenciales hardcodeadas
+DEFAULT_FILE_STORAGE = 'Backend.direct_cloudinary_storage.DirectCloudinaryStorage'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # DEBUG: Verificar configuración de Cloudinary
