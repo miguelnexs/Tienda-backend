@@ -37,12 +37,14 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         if value is None:
             return value
 
+        # Validar tipo de archivo
         allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
         if hasattr(value, 'content_type') and value.content_type not in allowed_types:
             raise serializers.ValidationError(
                 "Tipo de archivo no permitido. Use JPEG, PNG, WEBP, GIF o SVG"
             )
 
+        # Validar extensión
         valid_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']
         ext = os.path.splitext(value.name)[1].lower()
         if ext not in valid_extensions:
@@ -50,90 +52,99 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
                 "Formato de imagen no soportado. Use JPG, PNG, WEBP, GIF o SVG"
             )
 
+        # Validar tamaño (máximo 10MB)
         if value.size > 10 * 1024 * 1024:
             raise serializers.ValidationError(
                 "La imagen es demasiado grande. Máximo 10MB"
             )
+        
         return value
 
     def validate(self, attrs):
+        """
+        Validación general del serializer
+        """
+        # Remover slug si está presente para que se genere automáticamente
         attrs.pop('slug', None)
         return attrs
 
     def create(self, validated_data):
+        """
+        Crear categoría con manejo simplificado de imágenes
+        """
+        # Remover slug si está presente
         validated_data.pop('slug', None)
+        
+        # Obtener la imagen si existe
         imagen = validated_data.pop('imagen', None)
+        
+        # Crear la categoría
         categoria = super().create(validated_data)
+        
+        # Procesar imagen si se proporcionó
         if imagen:
-            self._save_imagen(categoria, imagen)
+            self._process_image(categoria, imagen)
+        
         return categoria
 
     def update(self, instance, validated_data):
+        """
+        Actualizar categoría con manejo simplificado de imágenes
+        """
+        # Remover slug si está presente
         validated_data.pop('slug', None)
+        
+        # Obtener la imagen si existe
         imagen = validated_data.pop('imagen', None)
+        
+        # Actualizar la categoría
         categoria = super().update(instance, validated_data)
+        
+        # Procesar imagen si se proporcionó
         if imagen:
-            self._save_imagen(categoria, imagen)
+            self._process_image(categoria, imagen)
+        
         return categoria
 
-    def _save_imagen(self, categoria, imagen):
+    def _process_image(self, categoria, imagen):
         """
-        Guardar imagen usando nuestro storage personalizado de Cloudinary
+        Procesar y guardar imagen de manera simplificada
         """
         try:
-            # Importar nuestro storage personalizado
-            from Backend.cloudinary_storage import CloudinaryStorage
-            cloudinary_storage = CloudinaryStorage()
+            # Generar nombre único para la imagen
+            import uuid
+            import os
+            from django.utils.text import slugify
             
-            # Si es un InMemoryUploadedFile, convertirlo a ContentFile
-            if isinstance(imagen, InMemoryUploadedFile):
-                # Leer el contenido del archivo
-                imagen.seek(0)  # Ir al inicio del archivo
-                content = imagen.read()
-                
-                # Crear ContentFile
-                content_file = ContentFile(content, name=imagen.name)
-                
-                # Generar nombre único para Cloudinary
-                import uuid
-                unique_name = f"categorias/{uuid.uuid4().hex}_{imagen.name}"
-                
-                # Guardar usando nuestro storage personalizado
-                saved_path = cloudinary_storage.save(unique_name, content_file)
-                
-                # IMPORTANTE: Actualizar el campo imagen con la URL de Cloudinary
-                categoria.imagen.name = saved_path
-                categoria.save()
-                
-                # Verificar que la URL se actualizó correctamente
-                categoria.refresh_from_db()
-                
-            else:
-                # Para otros tipos de archivo, guardar directamente
-                import uuid
-                unique_name = f"categorias/{uuid.uuid4().hex}_{imagen.name}"
-                saved_path = cloudinary_storage.save(unique_name, imagen)
-                categoria.imagen.name = saved_path
-                categoria.save()
-                categoria.refresh_from_db()
+            # Obtener extensión del archivo original
+            ext = os.path.splitext(imagen.name)[1].lower()
+            
+            # Crear nombre único
+            unique_name = f"categorias/{slugify(categoria.nombre)}_{uuid.uuid4().hex}{ext}"
+            
+            # Guardar la imagen usando el campo del modelo
+            categoria.imagen.save(unique_name, imagen, save=True)
             
             print(f"✅ Imagen guardada exitosamente para categoría: {categoria.nombre}")
             print(f"📁 Ruta de la imagen: {categoria.imagen.name}")
-            print(f"🔗 URL de la imagen: {categoria.imagen.url}")
             
             # Verificar si se guardó en Cloudinary
-            if 'cloudinary.com' in categoria.imagen.url:
-                print("☁️ ¡La imagen se subió a Cloudinary!")
-            else:
-                print("📁 La imagen se guardó localmente")
+            if hasattr(categoria.imagen, 'url'):
+                print(f"🔗 URL de la imagen: {categoria.imagen.url}")
+                if 'cloudinary.com' in categoria.imagen.url:
+                    print("☁️ ¡La imagen se subió a Cloudinary!")
+                else:
+                    print("📁 La imagen se guardó localmente")
             
         except Exception as e:
-            print(f"❌ Error al guardar imagen: {str(e)}")
-            raise serializers.ValidationError({
-                "imagen": f"Error al procesar la imagen: {str(e)}"
-            })
+            print(f"❌ Error al procesar imagen: {str(e)}")
+            # No lanzar excepción para no interrumpir la creación de la categoría
+            # Solo registrar el error
 
     def get_imagen_url(self, obj):
+        """
+        Obtener URL de la imagen
+        """
         if obj.imagen:
             try:
                 # Si la imagen está en Cloudinary, usar la URL completa
@@ -151,7 +162,12 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         return None
 
     def to_representation(self, instance):
+        """
+        Personalizar la representación del serializer
+        """
         data = super().to_representation(instance)
+        
+        # Asegurar que imagen_url esté presente
         if instance.imagen:
             try:
                 # Verificar si la imagen está en Cloudinary
@@ -169,4 +185,5 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
                 data['imagen_url'] = None
         else:
             data['imagen_url'] = None
+        
         return data
