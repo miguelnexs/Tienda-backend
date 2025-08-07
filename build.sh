@@ -20,4 +20,8 @@ python check_deployment.py
 echo "🚀 Arreglando migraciones de base de datos..."
 python fix_db_migrations.py
 
+# Test Cloudinary configuration
+echo "☁️ Probando configuración de Cloudinary..."
+python check_cloudinary_production.py
+
 echo "✅ Build completado exitosamente!" 
