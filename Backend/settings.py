@@ -29,14 +29,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Third-party apps
-    'corsheaders',
+    # Third party apps
     'rest_framework',
+    'corsheaders',
+    'crispy_forms',
+    'crispy_bootstrap5',
     'colorfield',
     'django_filters',
     'rest_framework_simplejwt',
     'nested_admin',
-    'cloudinary_storage',  # Para almacenamiento de imágenes en la nube
+    # 'cloudinary_storage',  # REMOVIDO - usando nuestro storage personalizado
     # 'debug_toolbar',  # Comentado temporalmente para producción
     
     # Local apps
@@ -313,11 +315,11 @@ cloudinary.config(
 
 # Configuración de almacenamiento para producción (Render)
 if 'RENDER' in os.environ:
-    # En producción, usar Cloudinary para archivos media
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+    # En producción, usar nuestro storage personalizado
+    DEFAULT_FILE_STORAGE = 'Backend.cloudinary_storage.CloudinaryStorage'
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     
-    # Configuración adicional para Cloudinary
+    # Configuración adicional para Cloudinary (mantenida para compatibilidad)
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': CLOUDINARY['cloud_name'],
         'API_KEY': CLOUDINARY['api_key'],
