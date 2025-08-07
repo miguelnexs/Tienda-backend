@@ -16,6 +16,10 @@ class CloudinaryStorage(Storage):
         self._cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', 'do1ntnlop')
         self._api_key = os.environ.get('CLOUDINARY_API_KEY', '117225377115856')
         self._api_secret = os.environ.get('CLOUDINARY_API_SECRET', 'e0YSrk3sT_70-ijM6mwdFBIWP9w')
+        
+        print(f"🔧 CloudinaryStorage inicializado:")
+        print(f"  Cloud Name: {self._cloud_name}")
+        print(f"  API Key: {self._api_key[:10]}...")
     
     def _get_cloudinary(self):
         """Obtener instancia de Cloudinary de forma lazy"""
@@ -27,6 +31,7 @@ class CloudinaryStorage(Storage):
                 api_secret=self._api_secret
             )
             self._cloudinary = cloudinary
+            print("✅ Cloudinary configurado en storage")
         return self._cloudinary
     
     def _open(self, name, mode='rb'):
@@ -38,6 +43,8 @@ class CloudinaryStorage(Storage):
         """Guardar archivo en Cloudinary"""
         try:
             cloudinary = self._get_cloudinary()
+            
+            print(f"📤 Subiendo archivo a Cloudinary: {name}")
             
             # Determinar el tipo de recurso basado en la extensión
             resource_type = "auto"
@@ -59,6 +66,10 @@ class CloudinaryStorage(Storage):
                 invalidate=True
             )
             
+            print(f"✅ Archivo subido exitosamente a Cloudinary:")
+            print(f"  Public ID: {result['public_id']}")
+            print(f"  URL: {result['secure_url']}")
+            
             # Devolver el public_id (nombre del archivo en Cloudinary)
             return result['public_id']
             
@@ -72,6 +83,7 @@ class CloudinaryStorage(Storage):
                     public_id=name,
                     overwrite=True
                 )
+                print(f"✅ Archivo subido en segundo intento: {result['public_id']}")
                 return result['public_id']
             except Exception as e2:
                 print(f"❌ Error en segundo intento: {e2}")
@@ -80,8 +92,11 @@ class CloudinaryStorage(Storage):
     def url(self, name):
         """Obtener URL del archivo en Cloudinary"""
         try:
-            return f"https://res.cloudinary.com/{self._cloud_name}/image/upload/{name}"
-        except:
+            url = f"https://res.cloudinary.com/{self._cloud_name}/image/upload/{name}"
+            print(f"🔗 URL generada: {url}")
+            return url
+        except Exception as e:
+            print(f"❌ Error generando URL: {e}")
             return f"/media/{name}"
     
     def exists(self, name):

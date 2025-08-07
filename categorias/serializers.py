@@ -130,6 +130,9 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
             # Crear nombre único
             unique_name = f"categorias/{slugify(categoria.nombre)}_{uuid.uuid4().hex}{ext}"
             
+            print(f"📤 Procesando imagen para categoría: {categoria.nombre}")
+            print(f"📁 Nombre único: {unique_name}")
+            
             # Guardar la imagen usando el campo del modelo
             categoria.imagen.save(unique_name, imagen, save=True)
             
@@ -143,6 +146,7 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
                     print("☁️ ¡La imagen se subió a Cloudinary!")
                 else:
                     print("📁 La imagen se guardó localmente")
+                    print("⚠️ Verificar configuración de DEFAULT_FILE_STORAGE")
             
         except Exception as e:
             print(f"❌ Error al procesar imagen: {str(e)}")
