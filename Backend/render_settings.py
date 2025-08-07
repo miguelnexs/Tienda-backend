@@ -30,8 +30,44 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Configurar storage local para Render
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Configuración de Cloudinary para Render (producción)
+CLOUDINARY = {
+    'cloud_name': os.environ.get('CLOUDINARY_CLOUD_NAME', 'do1ntnlop'),
+    'api_key': os.environ.get('CLOUDINARY_API_KEY', '1172253771'),
+    'api_secret': os.environ.get('CLOUDINARY_API_SECRET', 'e0YSrk3sT_'),
+}
+
+# Configurar Cloudinary para almacenamiento en producción
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+# Configurar Cloudinary
+cloudinary.config(
+    cloud_name=CLOUDINARY['cloud_name'],
+    api_key=CLOUDINARY['api_key'],
+    api_secret=CLOUDINARY['api_secret']
+)
+
+# En producción (Render), usar Cloudinary para archivos media
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+
+# Configuración adicional para Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': CLOUDINARY['cloud_name'],
+    'API_KEY': CLOUDINARY['api_key'],
+    'API_SECRET': CLOUDINARY['api_secret'],
+    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
+                                'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
+    'MAGIC_FILE_PATH': 'magic',
+    'STATIC_IMAGES_TRANSFORMATIONS': {
+        'default': {
+            'quality': 'auto',
+            'fetch_format': 'auto',
+        }
+    }
+}
 
 # Configuración de seguridad para producción
 SECURE_SSL_REDIRECT = False
