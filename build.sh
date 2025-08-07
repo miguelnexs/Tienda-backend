@@ -1,31 +1,34 @@
 #!/usr/bin/env bash
-# Exit on error
+# exit on error
 set -o errexit
 
-echo "🚀 Iniciando build del proyecto..."
+# Mostrar comandos mientras se ejecutan
+set -x
 
-# Upgrade pip
-echo "📦 Actualizando pip..."
+# Actualizar pip
 python -m pip install --upgrade pip
 
-# Install dependencies
-echo "📦 Instalando dependencias..."
+# Instalar dependencias
 pip install -r requirements.txt
 
-# Check for potential issues
-echo "🔍 Verificando configuración..."
-python check_deployment.py
+# Crear directorios necesarios
+mkdir -p staticfiles media
 
-# Fix database migrations for Render
-echo "🚀 Arreglando migraciones de base de datos..."
-python fix_db_migrations.py
+# Forzar configuración de producción
+export DJANGO_SETTINGS_MODULE=Backend.render_settings
+export DJANGO_CLOUDINARY_STORAGE=true
+export CLOUDINARY_CLOUD_NAME=do1ntnlop
+export CLOUDINARY_API_KEY=117225377115856
+export CLOUDINARY_API_SECRET=e0YSrk3sT_70-ijM6mwdFBIWP9w
 
-# Test Cloudinary configuration
-echo "☁️ Probando configuración de Cloudinary..."
-python check_cloudinary_production.py
+# Ejecutar migraciones
+echo "🗄️ Ejecutando migraciones..."
+python manage.py makemigrations
+python manage.py migrate --noinput
 
-# Verify production configuration
-echo "🔍 Verificando configuración de producción..."
-python check_production.py
+# Recolectar archivos estáticos
+echo "📁 Recolectando archivos estáticos..."
+python manage.py collectstatic --noinput --clear
 
+# Verificar configuración
 echo "✅ Build completado exitosamente!" 

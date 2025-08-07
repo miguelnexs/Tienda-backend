@@ -1,11 +1,10 @@
 services:
   - type: web
     name: tienda-backend-api
-    runtime: python3
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn Backend.wsgi:application"
-    plan: free
-    autoDeploy: false
+    env: python
+    region: ohio
+    buildCommand: ./build.sh
+    startCommand: gunicorn Backend.wsgi_production:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -28,9 +27,10 @@ services:
 
 databases:
   - name: tienda-db
+    region: ohio
+    plan: free
     databaseName: tienda_production
     user: tienda_user
-    plan: free
 
 buildCommand: |
   pip install --upgrade pip
