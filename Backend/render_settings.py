@@ -5,6 +5,9 @@ import os
 from .settings import *
 import dj_database_url
 
+# DEBUG: Verificar si este archivo se está cargando
+print("🚀 RENDER_SETTINGS.PY CARGADO - CONFIGURACIÓN DE PRODUCCIÓN ACTIVA")
+
 # Configuración específica para Render
 DEBUG = False
 
@@ -44,6 +47,12 @@ cloudinary.config(
 # En producción (Render), usar Cloudinary para archivos media
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+
+# DEBUG: Verificar configuración de Cloudinary
+print(f"☁️ CLOUDINARY CONFIGURADO:")
+print(f"  Cloud Name: {CLOUDINARY['cloud_name']}")
+print(f"  API Key: {CLOUDINARY['api_key'][:10]}...")
+print(f"  DEFAULT_FILE_STORAGE: {DEFAULT_FILE_STORAGE}")
 
 # Configuración adicional para Cloudinary
 CLOUDINARY_STORAGE = {
@@ -116,4 +125,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
-} 
+}
+
+# DEBUG: Confirmar que la configuración se aplicó
+print("✅ CONFIGURACIÓN DE RENDER APLICADA CORRECTAMENTE") 
