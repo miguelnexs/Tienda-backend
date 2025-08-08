@@ -6,6 +6,9 @@ from django.core.validators import MinValueValidator
 from colorfield.fields import ColorField
 from categorias.models import CategoriaProducto  # Importamos desde la nueva app
 
+# Importar el storage de Cloudinary
+from Backend.cloudinary_storage_fixed_urls import CloudinaryStorageFixedURLs
+
 
 class Producto(models.Model):
     """
@@ -53,7 +56,8 @@ class Producto(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Imagen principal"),
-        help_text=_("Imagen destacada del producto")
+        help_text=_("Imagen destacada del producto"),
+        storage=CloudinaryStorageFixedURLs()  # Agregar storage de Cloudinary
     )
 
     
@@ -486,7 +490,8 @@ class ImagenProducto(models.Model):
     imagen = models.ImageField(
         upload_to='productos/colores/',
         verbose_name=_("Imagen"),
-        help_text=_("Imagen del producto en este color")
+        help_text=_("Imagen del producto en este color"),
+        storage=CloudinaryStorageFixedURLs()  # Agregar storage de Cloudinary
     )
     
     orden = models.PositiveIntegerField(

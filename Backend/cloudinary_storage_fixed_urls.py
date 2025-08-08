@@ -159,43 +159,57 @@ class CloudinaryStorageFixedURLs(Storage):
     def url(self, name):
         """Obtener URL del archivo en Cloudinary - VERSIÓN CORREGIDA"""
         try:
-            # El name aquí es el public_id devuelto por _save
-            # Obtener la URL real desde Cloudinary para incluir el version ID
+            # Asegurarnos de que el name no tenga doble slash
+            name = name.replace('//', '/')
+            
+            # Construir la URL base de Cloudinary
+            base_url = f"https://res.cloudinary.com/{self._cloud_name}/image/upload"
+            
             try:
-                import cloudinary.api
+                # Intentar obtener la versión y transformaciones desde Cloudinary
                 result = cloudinary.api.resource(name)
-                url = result.get('secure_url', result.get('url'))
-                if url:
-                    print(f"🔗 URL generada desde Cloudinary: {url}")
+                if 'secure_url' in result:
+                    print(f"🔗 URL generada desde Cloudinary: {result['secure_url']}")
+                    return result['secure_url']
+                
+                # Si no hay secure_url pero tenemos version
+                if 'version' in result:
+                    url = f"{base_url}/v{result['version']}/{name}"
+                    print(f"🔗 URL generada con versión: {url}")
                     return url
+                
             except Exception as e:
-                print(f"⚠️ No se pudo obtener URL desde Cloudinary: {e}")
+                print(f"⚠️ No se pudo obtener info desde Cloudinary: {e}")
                 # Intentar con diferentes variaciones del nombre
                 variations = [
                     name,
+                    name.replace('categorias/', ''),  # Sin el prefijo categorias/
                     name + '.jpg',
                     name + '.png',
+                    name + '.webp',
                     name.replace('.jpg', ''),
-                    name.replace('.png', '')
+                    name.replace('.png', ''),
+                    name.replace('.webp', '')
                 ]
                 
                 for variation in variations:
                     try:
                         result = cloudinary.api.resource(variation)
-                        url = result.get('secure_url', result.get('url'))
-                        if url:
-                            print(f"🔗 URL generada con variación '{variation}': {url}")
-                            return url
+                        if 'secure_url' in result:
+                            print(f"🔗 URL generada con variación '{variation}': {result['secure_url']}")
+                            return result['secure_url']
                     except:
                         continue
             
-            # Fallback: generar URL básica
-            url = f"https://res.cloudinary.com/{self._cloud_name}/image/upload/{name}"
+            # Si todo lo demás falla, construir la URL directamente
+            url = f"{base_url}/{name}"
             print(f"🔗 URL generada (fallback): {url}")
             return url
+            
         except Exception as e:
             print(f"❌ Error generando URL: {e}")
-            return f"/media/{name}"
+            # Último recurso: construir la URL básica
+            return f"https://res.cloudinary.com/{self._cloud_name}/image/upload/{name}"
     
     def exists(self, name):
         """Verificar si el archivo existe en Cloudinary"""

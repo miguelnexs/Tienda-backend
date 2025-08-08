@@ -200,7 +200,7 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
         """
         data = super().to_representation(instance)
         
-        # Asegurar que imagen_url esté presente
+        # Asegurar que imagen_url esté presente y sea la URL de Cloudinary
         if instance.imagen:
             try:
                 url = instance.imagen.url
@@ -219,6 +219,14 @@ class CategoriaProductoSerializer(serializers.ModelSerializer):
                     else:
                         data['imagen_url'] = url
                         data['imagen'] = url
+                
+                # Asegurarnos de que la URL sea la de Cloudinary
+                if not data['imagen_url'].startswith('https://res.cloudinary.com/'):
+                    # Construir la URL de Cloudinary manualmente
+                    cloudinary_url = f"https://res.cloudinary.com/do1ntnlop/image/upload/{instance.imagen.name}"
+                    data['imagen_url'] = cloudinary_url
+                    data['imagen'] = cloudinary_url
+                
             except Exception as e:
                 print(f"Error generando URL para imagen: {str(e)}")
                 data['imagen_url'] = None

@@ -23,11 +23,19 @@ class ImagenProductoSerializer(serializers.ModelSerializer):
         """
         if obj.imagen:
             try:
-                # Construir URL absoluta
+                # Obtener la URL de la imagen
+                url = obj.imagen.url
+                
+                # Si es una URL de Cloudinary, devolverla tal como está
+                if 'cloudinary.com' in url:
+                    return url
+                
+                # Si es una URL local, construir la URL completa
                 request = self.context.get('request')
                 if request is not None:
-                    return request.build_absolute_uri(obj.imagen.url)
-                return obj.imagen.url
+                    return request.build_absolute_uri(url)
+                return url
+                
             except Exception as e:
                 print(f"Error generando URL para imagen {obj.id}: {str(e)}")
                 return None
@@ -52,6 +60,60 @@ class ImagenProductoSerializer(serializers.ModelSerializer):
                 )
         
         return data
+
+    def create(self, validated_data):
+        """
+        Crear imagen con manejo seguro
+        """
+        try:
+            # Verificar que la imagen no esté vacía
+            imagen = validated_data.get('imagen')
+            if not imagen or imagen.size == 0:
+                raise serializers.ValidationError("La imagen está vacía")
+            
+            # Generar nombre único para la imagen
+            import uuid
+            from django.utils.text import slugify
+            
+            color = validated_data.get('color')
+            producto_nombre = color.producto.nombre if color and color.producto else 'producto'
+            color_nombre = color.nombre if color else 'color'
+            
+            # Obtener extensión del archivo original
+            ext = os.path.splitext(imagen.name)[1].lower()
+            
+            # Crear nombre único
+            unique_name = f"productos/colores/{slugify(producto_nombre)}_{slugify(color_nombre)}_{uuid.uuid4().hex}{ext}"
+            
+            print(f"📤 Procesando imagen para color {color_nombre} de producto {producto_nombre}")
+            print(f"📁 Nombre único: {unique_name}")
+            
+            # Crear la instancia pero no guardar aún
+            instance = ImagenProducto(**validated_data)
+            
+            # Guardar la imagen con el nombre único
+            instance.imagen.save(unique_name, imagen, save=False)
+            
+            # Ahora guardar la instancia
+            instance.save()
+            
+            print(f"✅ Imagen guardada exitosamente")
+            print(f"📁 Ruta de la imagen: {instance.imagen.name}")
+            
+            # Verificar si se guardó en Cloudinary
+            if hasattr(instance.imagen, 'url'):
+                print(f"🔗 URL de la imagen: {instance.imagen.url}")
+                if 'cloudinary.com' in instance.imagen.url:
+                    print("☁️ ¡La imagen se subió a Cloudinary!")
+                else:
+                    print("📁 La imagen se guardó localmente")
+                    print("⚠️ Verificar configuración de DEFAULT_FILE_STORAGE")
+            
+            return instance
+            
+        except Exception as e:
+            print(f"❌ Error al procesar imagen: {str(e)}")
+            raise serializers.ValidationError(f"Error al procesar la imagen: {str(e)}")
 
 
 class ColorProductoSerializer(serializers.ModelSerializer):
@@ -195,11 +257,19 @@ class ColorProductoListSerializer(serializers.ModelSerializer):
         imagen_principal = obj.imagenes.filter(es_principal=True).first()
         if imagen_principal:
             try:
+                # Obtener la URL de la imagen
+                url = imagen_principal.imagen.url
+                
+                # Si es una URL de Cloudinary, devolverla tal como está
+                if 'cloudinary.com' in url:
+                    return url
+                
+                # Si es una URL local, construir la URL completa
                 request = self.context.get('request')
                 if request is not None:
-                    # Construir URL absoluta
-                    return request.build_absolute_uri(imagen_principal.imagen.url)
-                return imagen_principal.imagen.url
+                    return request.build_absolute_uri(url)
+                return url
+                
             except Exception as e:
                 print(f"Error generando URL para imagen de color {obj.nombre}: {str(e)}")
                 return None
@@ -208,11 +278,19 @@ class ColorProductoListSerializer(serializers.ModelSerializer):
         primera_imagen = obj.imagenes.first()
         if primera_imagen:
             try:
+                # Obtener la URL de la imagen
+                url = primera_imagen.imagen.url
+                
+                # Si es una URL de Cloudinary, devolverla tal como está
+                if 'cloudinary.com' in url:
+                    return url
+                
+                # Si es una URL local, construir la URL completa
                 request = self.context.get('request')
                 if request is not None:
-                    # Construir URL absoluta
-                    return request.build_absolute_uri(primera_imagen.imagen.url)
-                return primera_imagen.imagen.url
+                    return request.build_absolute_uri(url)
+                return url
+                
             except Exception as e:
                 print(f"Error generando URL para imagen de color {obj.nombre}: {str(e)}")
                 return None
