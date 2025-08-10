@@ -3,8 +3,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import api_info, health_check
 
 urlpatterns = [
+    # Ruta principal - Información de la API
+    path('/', api_info, name='api-info'),
+    
+    # Health check
+    path('health/', health_check, name='health-check'),
+    
     path('admin/', admin.site.urls),
     
     # API URLs

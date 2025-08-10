@@ -8,7 +8,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='default-secret-key')
 
 DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '72.60.7.133',  # IP del servidor VPS
+    'www.72.60.7.133',
+    '*',  # Mantener para desarrollo
+]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME') 
 if RENDER_EXTERNAL_HOSTNAME:
@@ -99,13 +105,22 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Configuración de archivos estáticos para OpenLiteSpeed
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Configuración de archivos media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuración adicional para OpenLiteSpeed
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuración CORS para desarrollo local
+# Configuración CORS para servidor VPS
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_CREDENTIALS = True
@@ -116,6 +131,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://localhost:5173",  # Vite por defecto
     "http://127.0.0.1:5173",
+    "http://72.60.7.133",  # IP del servidor VPS
+    "https://72.60.7.133",  # IP del servidor VPS con HTTPS
+    "http://www.72.60.7.133",
+    "https://www.72.60.7.133",
 ]
 CORS_ALLOW_METHODS = [
     'DELETE',
